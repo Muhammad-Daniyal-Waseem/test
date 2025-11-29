@@ -1,0 +1,3199 @@
+import { ArrowRight, CheckCircle, Download, Calendar, TrendingUp, Globe, Target, Users, Zap, Building2, BarChart3, Rocket, Clock, DollarSign, Briefcase, Shield, Package, Wrench, ChevronDown, ChevronUp, User, Award, Mail, TrendingDown, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ClientLogoBar, TrustBar, ROICalculator, ComparisonTable, FAQSection } from './components/ConversionElements';
+
+function App() {
+  const [activeSection, setActiveSection] = useState('');
+  const [showAllPackages, setShowAllPackages] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [showFloatingNav, setShowFloatingNav] = useState(false);
+  const [showExitIntent, setShowExitIntent] = useState(false);
+  const [emailCapture, setEmailCapture] = useState('');
+  const [showFAQ, setShowFAQ] = useState<{[key: number]: boolean}>({});
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ['why-me', 'results', 'pricing', 'about', 'contact'];
+      const scrollPosition = window.scrollY + 100;
+
+      setShowFloatingNav(window.scrollY > 500);
+
+      for (const sectionId of sections) {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSection(sectionId);
+            break;
+          }
+        }
+      }
+
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const scrollPercentage = (scrollTop / (documentHeight - windowHeight)) * 100;
+      setScrollProgress(scrollPercentage);
+    };
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0 && !sessionStorage.getItem('exitIntentShown')) {
+        setShowExitIntent(true);
+        sessionStorage.setItem('exitIntentShown', 'true');
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    const fadeElements = document.querySelectorAll('.fade-in');
+    fadeElements.forEach((el) => observer.observe(el));
+
+    window.addEventListener('scroll', handleScroll);
+    document.addEventListener('mouseleave', handleMouseLeave);
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Scroll Progress Bar */}
+      <div className="fixed top-0 left-0 right-0 h-1 bg-neutral-200 z-[60]">
+        <div
+          className="h-full bg-gradient-to-r from-blue-600 via-blue-700 to-amber-600 transition-all duration-300 ease-out"
+          style={{ width: `${scrollProgress}%` }}
+        ></div>
+      </div>
+
+      {/* Floating Action Sidebar */}
+      <div className={`fixed right-8 top-1/3 z-50 transition-all duration-500 ${showFloatingNav ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20 pointer-events-none'}`}>
+        <div className="bg-white rounded-2xl shadow-2xl p-3 space-y-4 border border-neutral-200">
+          <a href="#why-me" className={`group flex items-center justify-center w-12 h-12 rounded-xl transition-all relative ${activeSection === 'why-me' ? 'bg-blue-600 text-white' : 'bg-neutral-50 text-neutral-600 hover:bg-blue-50 hover:text-blue-600'}`} title="Why Me">
+            <Target className="h-5 w-5" />
+            <span className="absolute right-full mr-3 px-3 py-1.5 bg-neutral-900 text-white text-sm font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Why Me</span>
+          </a>
+          <a href="#results" className={`group flex items-center justify-center w-12 h-12 rounded-xl transition-all relative ${activeSection === 'results' ? 'bg-blue-600 text-white' : 'bg-neutral-50 text-neutral-600 hover:bg-blue-50 hover:text-blue-600'}`} title="Results">
+            <Award className="h-5 w-5" />
+            <span className="absolute right-full mr-3 px-3 py-1.5 bg-neutral-900 text-white text-sm font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Results</span>
+          </a>
+          <a href="#pricing" className={`group flex items-center justify-center w-12 h-12 rounded-xl transition-all relative ${activeSection === 'pricing' ? 'bg-blue-600 text-white' : 'bg-neutral-50 text-neutral-600 hover:bg-blue-50 hover:text-blue-600'}`} title="Pricing">
+            <Briefcase className="h-5 w-5" />
+            <span className="absolute right-full mr-3 px-3 py-1.5 bg-neutral-900 text-white text-sm font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Pricing</span>
+          </a>
+          <a href="#about" className={`group flex items-center justify-center w-12 h-12 rounded-xl transition-all relative ${activeSection === 'about' ? 'bg-blue-600 text-white' : 'bg-neutral-50 text-neutral-600 hover:bg-blue-50 hover:text-blue-600'}`} title="About">
+            <User className="h-5 w-5" />
+            <span className="absolute right-full mr-3 px-3 py-1.5 bg-neutral-900 text-white text-sm font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">About</span>
+          </a>
+          <div className="h-px bg-neutral-200 my-2"></div>
+          <a href="#contact" className={`group flex items-center justify-center w-12 h-12 rounded-xl transition-all relative ${activeSection === 'contact' ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'}`} title="Contact">
+            <Mail className="h-5 w-5" />
+            <span className="absolute right-full mr-3 px-3 py-1.5 bg-neutral-900 text-white text-sm font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Book Call</span>
+          </a>
+        </div>
+      </div>
+
+      {/* Exit Intent Popup */}
+      {showExitIntent && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-8 relative shadow-2xl">
+            <button onClick={() => setShowExitIntent(false)} className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-900 transition-colors">
+              <X className="h-6 w-6" />
+            </button>
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-full mb-4">
+                <Download className="h-8 w-8 text-amber-600" />
+              </div>
+              <h3 className="text-3xl font-bold text-neutral-900 mb-3">Wait! Before You Go...</h3>
+              <p className="text-lg text-neutral-600 mb-6">Get my free case study: How a $1.2M ARR ConTech company hit $4.1M in 11 months</p>
+            </div>
+            <div className="bg-neutral-50 rounded-xl p-6 mb-6">
+              <div className="space-y-3 text-sm text-neutral-700 mb-4">
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>Exact GTM strategy used (with templates)</span>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>Timeline breakdown: What happened each month</span>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>Mistakes we made (and how we fixed them)</span>
+                </div>
+              </div>
+              <input
+                type="email"
+                placeholder="Your email address"
+                value={emailCapture}
+                onChange={(e) => setEmailCapture(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-neutral-300 rounded-lg mb-3 focus:border-blue-600 focus:outline-none"
+              />
+              <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors">
+                Send Me The Case Study
+              </button>
+              <p className="text-xs text-neutral-500 mt-2 text-center">No spam. Unsubscribe anytime.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Navigation */}
+      <nav className="w-full bg-white border-b border-neutral-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <a href="#hero" className="flex items-center">
+              <img
+                src="/ConTechGMT - BLACK-FINAL - LOGO-2 - Edited.jpg"
+                alt="ConTechGTM"
+                className="h-10 w-auto object-contain hover:opacity-80 transition-opacity"
+              />
+            </a>
+            <div className="hidden md:flex items-center space-x-1">
+              <a
+                href="#why-me"
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  activeSection === 'why-me'
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50'
+                }`}
+              >
+                Why Me
+              </a>
+              <a
+                href="#results"
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  activeSection === 'results'
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50'
+                }`}
+              >
+                Results
+              </a>
+              <a
+                href="#pricing"
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  activeSection === 'pricing'
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50'
+                }`}
+              >
+                Pricing
+              </a>
+              <a
+                href="#about"
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  activeSection === 'about'
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50'
+                }`}
+              >
+                About
+              </a>
+              <a href="#contact" className="ml-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-semibold text-sm shadow-md hover:shadow-lg hover:scale-[1.02]">
+                Book Strategy Call
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section id="hero" className="pt-24 pb-12 bg-gradient-to-b from-neutral-50 to-white min-h-[90vh] flex items-center">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-full mb-5">
+                Elite Fractional CRO for ConTech & PropTech
+              </div>
+              <h1 className="text-5xl lg:text-6xl font-bold text-neutral-900 mb-5 leading-[1.1]">
+                Engineer Scalable, Predictable Board&#8209;Grade Revenue Growth
+              </h1>
+              <p className="text-lg text-neutral-600 mb-8 leading-[1.5]">
+                When Annual Recurring Revenue (ARR) is flat, churn eats new logo wins and you're out of ideas, we install an inventive, tested, data-centric sales architecture and execution cadence to hit plan relentlessly.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <a href="#contact" className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-all hover:shadow-lg hover:scale-[1.02]">
+                  Book Discovery Call
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </a>
+                <a href="#lead-magnet" className="inline-flex items-center justify-center px-8 py-4 border-2 border-neutral-900 text-neutral-900 text-lg font-semibold rounded-lg hover:bg-neutral-900 hover:text-white transition-all hover:shadow-lg">
+                  <Download className="mr-2 h-5 w-5" />
+                  FREE Video: 4 Growth Tips
+                </a>
+              </div>
+              <div className="flex flex-wrap gap-6 text-sm text-neutral-600">
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
+                  No Long-Term Contracts
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
+                  Start Within 2 Weeks
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
+                  Proven Track Record
+                </div>
+              </div>
+            </div>
+            <div className="hidden lg:block">
+              <div className="relative w-full max-w-md ml-auto">
+                <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-neutral-100 rounded-3xl transform rotate-3"></div>
+                <div className="relative bg-white rounded-3xl p-10 shadow-2xl border border-neutral-200">
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between pb-6 border-b border-neutral-200">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-14 h-14 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <TrendingUp className="h-7 w-7 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-3xl font-bold text-neutral-900">+247%</div>
+                          <div className="text-sm text-neutral-500">ARR Growth</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pb-6 border-b border-neutral-200">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-14 h-14 bg-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <BarChart3 className="h-7 w-7 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-3xl font-bold text-neutral-900">3.2x</div>
+                          <div className="text-sm text-neutral-500">Pipeline Velocity</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pb-6 border-b border-neutral-200">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-14 h-14 bg-amber-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Target className="h-7 w-7 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-3xl font-bold text-neutral-900">89%</div>
+                          <div className="text-sm text-neutral-500">Win Rate</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-14 h-14 bg-violet-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Zap className="h-7 w-7 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-3xl font-bold text-neutral-900">3:1</div>
+                          <div className="text-sm text-neutral-500">CLV:CAC Ratio</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trusted By Section */}
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-neutral-50">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-center text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-8">
+            Trusted by Leading ConTech & PropTech Innovators
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-50">
+            <div className="flex items-center justify-center h-16 bg-neutral-200 rounded-lg">
+              <Building2 className="h-8 w-8 text-neutral-600" />
+            </div>
+            <div className="flex items-center justify-center h-16 bg-neutral-200 rounded-lg">
+              <Target className="h-8 w-8 text-neutral-600" />
+            </div>
+            <div className="flex items-center justify-center h-16 bg-neutral-200 rounded-lg">
+              <TrendingUp className="h-8 w-8 text-neutral-600" />
+            </div>
+            <div className="flex items-center justify-center h-16 bg-neutral-200 rounded-lg">
+              <Rocket className="h-8 w-8 text-neutral-600" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Client Logo Trust Bar */}
+      <ClientLogoBar />
+
+      {/* Trust & Urgency Bar */}
+      <TrustBar />
+
+      {/* Strategic CTA - Jump to Why ConTech */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-600 to-blue-800 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm text-white text-xs font-bold rounded-full mb-4 uppercase tracking-wider">
+            Before You Look at Pricing
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
+            Do I Actually Understand Your Market?
+          </h2>
+          <p className="text-lg text-blue-50 mb-8 leading-relaxed max-w-2xl mx-auto">
+            Most fractional CROs are ex-SaaS generalists. I've closed millions in ARR selling to GCs, asset owners, architects, and consultants. Let me prove I understand your buyers better than you do.
+          </p>
+          <a href="#why-me" className="inline-flex items-center px-8 py-4 bg-white text-blue-900 font-bold rounded-lg hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] text-lg">
+            See My Construction Buyer Expertise
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </a>
+        </div>
+      </section>
+
+      {/* Lead Magnet Section */}
+      <section id="lead-magnet" className="py-16 px-4 sm:px-6 lg:px-8 bg-white border-y-2 border-neutral-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-12 max-w-4xl">
+            <div className="inline-block px-3 py-1 bg-amber-50 text-amber-800 text-xs font-semibold rounded-full mb-4 border border-amber-200">
+              PRO BONO · BOARD-GRADE
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-6">
+              The CRO Command Brief™
+            </h2>
+            <p className="text-xl text-neutral-600 leading-relaxed">
+              Tell me the single sales/revenue challenge blocking your quarter. I'll return a <span className="font-semibold text-neutral-900">1-page executive Note</span> with the root cause and a practical <span className="font-semibold text-neutral-900">30–60 day fix</span>. <span className="font-semibold text-neutral-900">6 per month. Founders/CEOs only.</span> No pitch. Confidential. (NDA available.)
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8 mb-12">
+            {/* What Is the Offer */}
+            <div className="lg:col-span-2 bg-neutral-50 rounded-2xl p-8 border-2 border-neutral-200">
+              <h3 className="text-2xl font-bold text-neutral-900 mb-6">What Is the Offer?</h3>
+              <div className="space-y-4 text-neutral-600 leading-relaxed mb-8">
+                <p>
+                  A <span className="font-semibold text-neutral-900">1-page, board-style memo</span> that isolates your <span className="font-semibold text-neutral-900">#1 revenue constraint</span> (not symptoms) and prescribes a <span className="font-semibold text-neutral-900">clear, time-boxed operating plan</span>.
+                </p>
+                <p>
+                  Based on your data and a 20-minute discovery, I map <span className="font-semibold text-neutral-900">cause → evidence → prescription → risks → metric to watch → weekly cadence</span>.
+                </p>
+                <p>
+                  You keep the Note. Implement it with your team or invite me to help—your call.
+                </p>
+              </div>
+
+              <div className="bg-white rounded-xl p-6 border-2 border-neutral-200 mb-6">
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <div>
+                    <div className="text-sm font-semibold text-neutral-900 mb-2">What You Provide (2 minutes):</div>
+                    <div className="text-sm text-neutral-600">Your challenge (1–2 lines) + stage, Annual Contract Value (ACV), sales cycle, win rate, pipeline coverage (+ optional Customer Relationship Management (CRM) snapshot)</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-neutral-900 mb-2">Turnaround:</div>
+                    <div className="text-sm text-neutral-600">Discovery today → Note within 72 hours → optional 15-minute founder readout</div>
+                  </div>
+                </div>
+              </div>
+
+              <h4 className="text-xl font-bold text-neutral-900 mb-4">Why It's Valuable</h4>
+              <div className="space-y-3">
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="font-semibold text-neutral-900">Board-confident clarity:</div>
+                    <div className="text-sm text-neutral-600">A single, defensible diagnosis that aligns Marketing, Sales, and CS on what actually moves the number</div>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="font-semibold text-neutral-900">Immediate execution:</div>
+                    <div className="text-sm text-neutral-600">2–3 high-leverage plays written as owner/effort/impact with first calendarised steps—no guessing</div>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="font-semibold text-neutral-900">Operating discipline:</div>
+                    <div className="text-sm text-neutral-600">MEDDPICC stage exits, hygiene rules, and a one-number forecast ritual you can run next week</div>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="font-semibold text-neutral-900">De-risked trial of my approach:</div>
+                    <div className="text-sm text-neutral-600">Zero cost, zero pitch, limited slots—proof of value before engagement</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Impact & Results */}
+            <div className="bg-neutral-900 text-white rounded-2xl p-8">
+              <h3 className="text-xl font-bold mb-4">Impact & Results</h3>
+              <p className="text-sm text-neutral-300 mb-6">30–60 Days when implemented.</p>
+
+              <div className="space-y-4">
+                <div className="bg-neutral-800 rounded-lg p-4">
+                  <div className="font-semibold mb-1">Cadence live</div>
+                  <div className="text-sm text-neutral-300">Weekly revenue rhythm running (attendance ≥95%) + two deal clinics completed</div>
+                </div>
+                <div className="bg-neutral-800 rounded-lg p-4">
+                  <div className="font-semibold mb-1">Pipeline quality up</div>
+                  <div className="text-sm text-neutral-300">Top-20 opps compliant with new stage exits (≥90% hygiene), median deal age −15–20%</div>
+                </div>
+                <div className="bg-neutral-800 rounded-lg p-4">
+                  <div className="font-semibold mb-1">Demand moving</div>
+                  <div className="text-sm text-neutral-300">Two outbound tracks live; ≥8 qualified conversations booked or ≥20% uplift in weekly opp creation</div>
+                </div>
+                <div className="bg-neutral-800 rounded-lg p-4">
+                  <div className="font-semibold mb-1">Forecasting steadier</div>
+                  <div className="text-sm text-neutral-300">Two consecutive weekly forecasts within ±20–25% of actuals; leaders using shared dashboards</div>
+                </div>
+              </div>
+
+              <p className="text-xs text-neutral-400 mt-6 italic">
+                This is not a revenue guarantee; it's a concrete plan with leading indicators your board respects—and a fast way to judge my fit.
+              </p>
+            </div>
+          </div>
+
+          {/* Who It's For & Guardrails */}
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="bg-blue-50 rounded-2xl p-8 border-2 border-blue-200">
+              <h3 className="text-xl font-bold text-neutral-900 mb-4">Who It's For</h3>
+              <p className="text-neutral-700 mb-4 leading-relaxed">
+                <span className="font-semibold text-neutral-900">ConTech / PropTech / CleanTech SaaS</span> (5–200 FTE) led by a Founder/CEO or P&L owner.
+              </p>
+              <div className="text-sm text-neutral-700">
+                <div className="font-semibold text-neutral-900 mb-2">Common triggers:</div>
+                <ul className="space-y-1.5 ml-4">
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>Slipped late-stage deals</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>Noisy Marketing Qualified Leads (MQLs) → weak Sales Qualified Leads (SQLs)</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>Fuzzy Sales↔CS hand-offs</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>Net Revenue Retention (NRR) / expansion underpowered</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>Forecast variance stressing board updates</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="bg-neutral-50 rounded-2xl p-8 border-2 border-neutral-200">
+              <h3 className="text-xl font-bold text-neutral-900 mb-4">Guardrails (to keep quality high)</h3>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <div className="w-8 h-8 bg-neutral-200 rounded-lg flex items-center justify-center mr-3 flex-shrink-0 text-neutral-900 font-bold text-sm">
+                    6
+                  </div>
+                  <div className="pt-1">
+                    <div className="font-semibold text-neutral-900">Notes per month</div>
+                    <div className="text-sm text-neutral-600">One per company per quarter</div>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-3 mt-1 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm text-neutral-700">I may decline if it's outside my lane (keeps standards high)</div>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-3 mt-1 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm text-neutral-700">Confidential by default; NDA on request. No sequences, ever.</div>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-3 mt-1 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm text-neutral-700">72-hour turnaround guaranteed - board-ready insights delivered on schedule</div>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-3 mt-1 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm text-neutral-700">Direct access to me - no account managers, just expert-to-founder dialogue</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-2xl p-12 text-center text-white">
+            <h3 className="text-3xl font-bold mb-4">Ready to Identify Your Revenue Constraint?</h3>
+            <p className="text-lg text-neutral-300 mb-8 max-w-2xl mx-auto">
+              Limited to 6 founders per month. Share your challenge and get board-grade clarity within 72 hours.
+            </p>
+            <a
+              href="#contact"
+              className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Download className="mr-2 h-5 w-5" />
+              Apply for a CRO Command Brief™
+            </a>
+            <p className="text-sm text-neutral-400 mt-4">
+              No pitch. No obligation. Confidential.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section id="pricing" className="py-16 px-4 sm:px-6 lg:px-8 bg-neutral-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-6">
+              Pricing & Engagement Models
+            </h2>
+            <p className="text-xl text-neutral-600 leading-relaxed">
+              Three core engagement models for different stages and needs. All built on ConTech-specific GTM patterns and proven playbooks.
+            </p>
+          </div>
+
+          {/* Not Sure CTA */}
+          <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-200 rounded-2xl p-8 mb-16">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+              <div className="flex-1 text-center lg:text-left">
+                <div className="font-bold text-neutral-900 text-2xl mb-3">Not sure which engagement model fits?</div>
+                <div className="text-neutral-700 text-lg leading-relaxed">Book a 20-minute fit call and I'll recommend the right approach for your stage and constraints.</div>
+              </div>
+              <a href="#contact" className="flex-shrink-0 inline-flex items-center px-8 py-4 bg-blue-600 text-white font-bold text-lg rounded-xl hover:bg-blue-700 transition-all shadow-md hover:shadow-xl whitespace-nowrap transform hover:scale-105">
+                Book Fit Call
+                <ArrowRight className="ml-3 h-5 w-5" />
+              </a>
+            </div>
+          </div>
+
+          {/* Package 1: Fractional CRO - LITE */}
+          <div className="bg-white border-2 border-blue-200 rounded-2xl p-8 md:p-12 mb-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <div className="inline-block px-3 py-1 bg-blue-50 text-blue-800 text-xs font-semibold rounded-full mb-4 border border-blue-200">
+                  ONGOING ENGAGEMENT
+                </div>
+                <div className="flex items-center mb-4">
+                  <div className="bg-blue-50 rounded-xl p-3 mr-4 border-2 border-blue-200">
+                    <Target className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-bold text-neutral-900">
+                    Fractional CRO – LITE
+                  </h3>
+                </div>
+                <p className="text-lg text-neutral-600 mb-6 leading-relaxed">
+                  Strategic Oversight + Execution Guidance
+                </p>
+
+                <div className="bg-neutral-50 rounded-xl p-6 mb-6">
+                  <h4 className="font-semibold text-neutral-900 mb-3">Ideal Fit</h4>
+                  <p className="text-neutral-700 text-sm leading-relaxed">
+                    Early-stage teams (typically $500K–$2M ARR, 5–15 people) with <span className="font-semibold">a basic sales motion that needs strategic direction</span> rather than daily hands-on work. You have one or two sales reps performing reasonably well, but lack the expertise to optimise pipeline, coach effectively, or build board-level revenue rigour. Perfect for founders who need <span className="font-semibold">an experienced advisor in their corner</span> without full-time commitment.
+                  </p>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                  <h4 className="font-semibold text-neutral-900">Core Deliverables (Monthly + As-Needed)</h4>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Monthly revenue strategy session</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Pipeline review and deal guidance</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Monthly sales rep coaching</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Quarterly planning and goal-setting</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Revenue reporting framework</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Async support via Slack/email</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                  <h4 className="font-semibold text-neutral-900 mb-3">Typical Outcomes (90 Days)</h4>
+                  <ul className="space-y-2 text-sm text-neutral-700">
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Pipeline visibility +60%</span> (clear stages, accurate close dates)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Forecast confidence established</span> (monthly variance within ±25%)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Rep performance +10–15%</span> (coaching drives consistent behaviors)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Strategic clarity</span>: revenue roadmap aligned with board expectations</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="lg:border-l-2 lg:border-neutral-200 lg:pl-8">
+                <div className="bg-neutral-900 text-white rounded-xl p-6 mb-6">
+                  <div className="text-sm text-neutral-300 mb-2">Investment</div>
+                  <div className="text-4xl font-bold mb-4">$4,200<span className="text-xl font-normal text-neutral-300">/mo</span></div>
+                  <div className="text-sm text-neutral-300 leading-relaxed">
+                    Flat monthly rate; no hidden fees
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Commitment</div>
+                    <div className="text-sm text-neutral-600">3-month minimum; most engagements run 6–9 months</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Time Allocation</div>
+                    <div className="text-sm text-neutral-600">~1 day/week (strategic focus)</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Best For</div>
+                    <ul className="text-sm text-neutral-600 space-y-1">
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>$500K–$2M ARR, establishing sales motion</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Founder needs strategic partner</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Basic sales motion in place</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Limited budget for leadership</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <a href="#contact" className="block w-full text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors mt-8">
+                  Schedule a Call
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Package 2: Fractional CRO - CORE */}
+          <div className="bg-white border-2 border-blue-300 rounded-2xl p-8 md:p-12 mb-8 shadow-lg">
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <div className="inline-block px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full mb-4">
+                  ONGOING ENGAGEMENT · MOST POPULAR
+                </div>
+                <div className="flex items-center mb-4">
+                  <div className="bg-blue-600 rounded-xl p-3 mr-4">
+                    <Rocket className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-bold text-neutral-900">
+                    Fractional CRO – CORE
+                  </h3>
+                </div>
+                <p className="text-lg text-neutral-600 mb-6 leading-relaxed">
+                  Strategic Leadership + Weekly Execution
+                </p>
+
+                <div className="bg-neutral-50 rounded-xl p-6 mb-6">
+                  <h4 className="font-semibold text-neutral-900 mb-3">Ideal Fit</h4>
+                  <p className="text-neutral-700 text-sm leading-relaxed">
+                    Growing teams ($2M–$8M ARR, 10–40 people) that need <span className="font-semibold">consistent leadership presence and hands-on execution</span> to scale predictably. You have multiple sales reps, pipeline challenges, and need someone <span className="font-semibold">driving weekly accountability</span> across pipeline reviews, forecasting, team coaching, and revenue operations. This is the sweet spot between strategic advisor and embedded leader.
+                  </p>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                  <h4 className="font-semibold text-neutral-900">Core Deliverables (Weekly + Monthly)</h4>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Weekly pipeline review and deal strategy</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Bi-weekly sales team coaching</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Revenue strategy and quarterly planning</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Forecast management and reporting</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Revenue operations optimization</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Board-ready metrics and narrative</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Sales process refinement</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Hiring support and onboarding</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                  <h4 className="font-semibold text-neutral-900 mb-3">Typical Outcomes (90 Days)</h4>
+                  <ul className="space-y-2 text-sm text-neutral-700">
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Pipeline hygiene ≥85%</span> (clean stages, accurate data, predictable motion)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Forecast accuracy ≤18%</span> (weekly variance within tight range)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Sales velocity +20–35%</span> (shorter cycles or improved win rates)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Team performance consistency</span>: reps hitting quota within 10% variance</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Leadership confidence</span>: board trusts revenue trajectory</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="lg:border-l-2 lg:border-neutral-200 lg:pl-8">
+                <div className="bg-blue-600 text-white rounded-xl p-6 mb-6">
+                  <div className="text-sm text-blue-100 mb-2">Investment</div>
+                  <div className="text-4xl font-bold mb-4">$7,500<span className="text-xl font-normal text-blue-100">/mo</span></div>
+                  <div className="text-sm text-blue-100 leading-relaxed">
+                    Best value for scaling teams
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-6">
+                  <div className="text-xs font-bold text-blue-900 uppercase tracking-wider mb-2">Most Popular</div>
+                  <div className="text-sm text-neutral-700">70% of clients choose CORE for balanced strategic + tactical execution</div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Commitment</div>
+                    <div className="text-sm text-neutral-600">3-month minimum; typical engagement is 9–15 months</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Time Allocation</div>
+                    <div className="text-sm text-neutral-600">~2 days/week (strategic + hands-on)</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Best For</div>
+                    <ul className="text-sm text-neutral-600 space-y-1">
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Scaling, $2M–$8M ARR</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Multiple reps needing coaching</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Pipeline needs weekly attention</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Board expects consistent execution</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <a href="#contact" className="block w-full text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors mt-8">
+                  Schedule a Call
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Package 3: Fractional CRO - INTENSIVE */}
+          <div className="bg-white border-2 border-blue-400 rounded-2xl p-8 md:p-12 mb-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <div className="inline-block px-3 py-1 bg-gradient-to-r from-blue-700 to-blue-900 text-white text-xs font-semibold rounded-full mb-4">
+                  ONGOING ENGAGEMENT · PREMIUM
+                </div>
+                <div className="flex items-center mb-4">
+                  <div className="bg-blue-700 rounded-xl p-3 mr-4">
+                    <TrendingUp className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-bold text-neutral-900">
+                    Fractional CRO – INTENSIVE
+                  </h3>
+                </div>
+                <p className="text-lg text-neutral-600 mb-6 leading-relaxed">
+                  Deeply Embedded Revenue Leadership
+                </p>
+
+                <div className="bg-neutral-50 rounded-xl p-6 mb-6">
+                  <h4 className="font-semibold text-neutral-900 mb-3">Ideal Fit</h4>
+                  <p className="text-neutral-700 text-sm leading-relaxed">
+                    High-growth or turnaround teams ($8M–$25M ARR, 40–150 people) facing <span className="font-semibold">urgent revenue pressure, complex scaling challenges, or transformation needs</span>. You need someone who operates like a full-time Chief Revenue Officer—<span className="font-semibold">daily presence, deep operational involvement, and direct accountability</span> for revenue outcomes. This is the premium alternative to a $250K+ full-time hire, delivering executive-level impact with fractional flexibility.
+                  </p>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                  <h4 className="font-semibold text-neutral-900">Core Deliverables (Daily + Weekly)</h4>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Daily pipeline monitoring and interventions</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Weekly individual rep coaching</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Weekly team pipeline and forecast calls</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Executive leadership participation</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Complete revenue operations ownership</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Board presentations and investor relations</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Strategic planning and market expansion</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Full-cycle hiring and onboarding</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Sales playbook evolution</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-neutral-700">Customer success alignment</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                  <h4 className="font-semibold text-neutral-900 mb-3">Typical Outcomes (90 Days)</h4>
+                  <ul className="space-y-2 text-sm text-neutral-700">
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Pipeline excellence ≥90%</span> (institutional-grade data quality and rigor)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Forecast precision ≤15%</span> (weekly actuals within narrow band)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Sales productivity +25–45%</span> (measurable velocity and conversion gains)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Team scaling</span>: consistent quota attainment across growing organisation</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Organisational transformation</span>: revenue machine runs without daily founder involvement</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><span className="font-semibold">Board confidence</span>: predictable, defensible growth trajectory established</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="lg:border-l-2 lg:border-neutral-200 lg:pl-8">
+                <div className="bg-neutral-900 text-white rounded-xl p-6 mb-6">
+                  <div className="text-sm text-neutral-300 mb-2">Investment</div>
+                  <div className="text-4xl font-bold mb-4">$16,500<span className="text-xl font-normal text-neutral-300">/mo</span></div>
+                  <div className="text-sm text-neutral-300 leading-relaxed">
+                    Executive CRO impact at 55% of full-time cost
+                  </div>
+                </div>
+
+                <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 mb-6">
+                  <div className="text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">Value Proposition</div>
+                  <div className="text-sm text-neutral-700 mb-2">Full-time CRO: $250K+ salary + equity + benefits = $360K+ annually</div>
+                  <div className="text-sm font-semibold text-amber-900">INTENSIVE delivers executive impact for $198K/year — saves $160K+ with zero recruiting risk</div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Commitment</div>
+                    <div className="text-sm text-neutral-600">3-month minimum; typical engagement is 12–18 months</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Time Allocation</div>
+                    <div className="text-sm text-neutral-600">~3 days/week (fully embedded)</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Best For</div>
+                    <ul className="text-sm text-neutral-600 space-y-1">
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Scale-up stage, $8M–$25M ARR</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Revenue turnaround or transformation</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Large or complex sales organisation</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Need full-time presence, fractional cost</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Board mandating immediate results</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <a href="#contact" className="block w-full text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors mt-8">
+                  Schedule a Call
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Specialized Engagement Options Divider */}
+          <div className={`transition-all duration-300 ${showAllPackages ? 'my-20' : 'my-12'}`}>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                <div className="w-full border-t-2 border-neutral-300"></div>
+              </div>
+              <div className="relative flex justify-center">
+                <button
+                  onClick={() => setShowAllPackages(!showAllPackages)}
+                  className="group px-10 py-5 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                >
+                  <div className="flex flex-col items-center text-center gap-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl font-bold">
+                        {showAllPackages ? 'Hide' : 'View'} 5 Specialized Engagement Options
+                      </span>
+                      <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                        {showAllPackages ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                      </div>
+                    </div>
+                    <span className="text-sm text-blue-100 font-medium">
+                      Sprints • Audits • Advisory Retainers • Custom Engagements
+                    </span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Collapsible Additional Packages */}
+          <div className={`transition-all duration-500 overflow-hidden ${showAllPackages ? 'max-h-[50000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+          {/* Package 2: GTM Sprint (The 4-Week Revenue Blueprint) */}
+          <div className="bg-white border-2 border-neutral-200 rounded-2xl p-8 md:p-12 mb-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <div className="inline-block px-3 py-1 bg-amber-50 text-amber-800 text-xs font-semibold rounded-full mb-4 border border-amber-200">
+                  FIXED SCOPE · 4 WEEKS
+                </div>
+                <div className="flex items-center mb-4">
+                  <div className="bg-amber-100 rounded-xl p-3 mr-4 border-2 border-amber-200">
+                    <Zap className="h-8 w-8 text-amber-700" />
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-bold text-neutral-900">
+                    GTM Sprint
+                  </h3>
+                </div>
+                <p className="text-lg text-neutral-600 mb-6 leading-relaxed">
+                  The 4-Week Revenue Blueprint
+                </p>
+
+                <div className="bg-neutral-50 rounded-xl p-6 mb-6">
+                  <h4 className="font-semibold text-neutral-900 mb-3">Ideal Fit</h4>
+                  <p className="text-neutral-700 text-sm leading-relaxed">
+                    Teams with <span className="font-semibold">urgent Go-To-Market (GTM) uncertainty</span>: launching a new product, pivoting ICP, entering a new vertical, or replacing a "spray-and-pray" motion with something defensible. You need a <span className="font-semibold">complete revenue playbook fast</span>—not a 6-month consulting deck.
+                  </p>
+                </div>
+
+                <div className="space-y-6 mb-8">
+                  <div>
+                    <h4 className="font-semibold text-neutral-900 mb-3">Sprint Deliverables</h4>
+                    <div className="space-y-3">
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">Week 1: Ideal Customer Profile (ICP) & Positioning</div>
+                        <div className="text-sm text-neutral-600">Buyer persona map, value prop hierarchy, competitive positioning</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">Week 2: Sales Process Design</div>
+                        <div className="text-sm text-neutral-600">MEDDPICC-based methodology, stage definitions, qualification criteria, objection library</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">Week 3: Channel Strategy</div>
+                        <div className="text-sm text-neutral-600">Outbound sequences, partnerships, content plays, SDR/AE split (if applicable)</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">Week 4: Implementation Roadmap</div>
+                        <div className="text-sm text-neutral-600">90-day execution plan with owners, milestones, success metrics</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                    <h4 className="font-semibold text-neutral-900 mb-3">What You Own at the End</h4>
+                    <ul className="space-y-2 text-sm text-neutral-700">
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span>A <span className="font-semibold">board-ready GTM deck</span> (20–30 slides)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Sales playbook</span> (qualification checklists, email templates, call scripts)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Channel prioritization matrix</span> (where to hunt & how)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">90-day roadmap</span> with KPIs, owners, weekly milestones</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span>Optional: <span className="font-semibold">30-day implementation support</span> (weekly check-ins, $3K add-on)</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:border-l-2 lg:border-neutral-200 lg:pl-8">
+                <div className="bg-neutral-900 text-white rounded-xl p-6 mb-6">
+                  <div className="text-sm text-neutral-300 mb-2">Investment</div>
+                  <div className="text-4xl font-bold mb-4">$15K<span className="text-xl font-normal text-neutral-300"></span></div>
+                  <div className="text-sm text-neutral-300 leading-relaxed">
+                    Fixed fee, payable 50% upfront / 50% at delivery
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Timeline</div>
+                    <div className="text-sm text-neutral-600">4 weeks from kickoff to final readout</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Your Commitment</div>
+                    <div className="text-sm text-neutral-600">~6 hours total (kickoff, 3 check-ins, final presentation)</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Best For</div>
+                    <ul className="text-sm text-neutral-600 space-y-1">
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Product launch or pivot</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>New vertical/geo expansion</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Replacing ad-hoc sales with a system</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Board asking "what's the GTM plan?"</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-5 my-6">
+                  <div className="text-xs font-bold text-blue-900 uppercase tracking-wider mb-3">Typical Results</div>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-neutral-600">Board alignment</span>
+                        <span className="text-sm font-bold text-blue-900">Week 5</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-neutral-600">First qualified pipeline</span>
+                        <span className="text-sm font-bold text-blue-900">30-45 days</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-neutral-600">Sales cycle clarity</span>
+                        <span className="text-sm font-bold text-blue-900">60 days</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 mb-6">
+                  <div className="text-xs font-semibold text-neutral-900 mb-2">Availability</div>
+                  <div className="text-sm text-neutral-600">Next sprint starts within 2 weeks</div>
+                </div>
+
+                <a href="#contact" className="block w-full text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                  Start a Sprint
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Package 3: RevOps Build (The Infrastructure Sprint) */}
+          <div className="bg-white border-2 border-neutral-200 rounded-2xl p-8 md:p-12 mb-12">
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <div className="inline-block px-3 py-1 bg-green-50 text-green-800 text-xs font-semibold rounded-full mb-4 border border-green-200">
+                  FIXED SCOPE · 6 WEEKS
+                </div>
+                <div className="flex items-center mb-4">
+                  <div className="bg-green-100 rounded-xl p-3 mr-4 border-2 border-green-200">
+                    <Building2 className="h-8 w-8 text-green-700" />
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-bold text-neutral-900">
+                    RevOps Build
+                  </h3>
+                </div>
+                <p className="text-lg text-neutral-600 mb-6 leading-relaxed">
+                  The Infrastructure Sprint
+                </p>
+
+                <div className="bg-neutral-50 rounded-xl p-6 mb-6">
+                  <h4 className="font-semibold text-neutral-900 mb-3">Ideal Fit</h4>
+                  <p className="text-neutral-700 text-sm leading-relaxed">
+                    Teams whose <span className="font-semibold">CRM is a mess</span>, forecasting is guesswork, and board decks take 3 days to build. You need <span className="font-semibold">plumbing, not strategy</span>: clean data, automated reports, a single source of truth. Often pairs with a GTM Sprint or Fractional CRO kickoff.
+                  </p>
+                </div>
+
+                <div className="space-y-6 mb-8">
+                  <div>
+                    <h4 className="font-semibold text-neutral-900 mb-3">Build Deliverables</h4>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1 text-sm">CRM Rebuild</div>
+                        <div className="text-xs text-neutral-600">Pipeline stages, required fields, automation rules (HubSpot/Salesforce/Pipedrive)</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1 text-sm">Dashboard Suite</div>
+                        <div className="text-xs text-neutral-600">Revenue KPIs, rep scorecards, pipeline health, forecast accuracy</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1 text-sm">Forecasting Model</div>
+                        <div className="text-xs text-neutral-600">3-stage commit (Best Case / Commit / Closed), weekly rituals</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1 text-sm">Data Hygiene SOP</div>
+                        <div className="text-xs text-neutral-600">Weekly audits, rep accountability, field validation rules</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1 text-sm">Sales Sequences</div>
+                        <div className="text-xs text-neutral-600">Automated follow-ups, task creation, stage-based triggers</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1 text-sm">Training & Docs</div>
+                        <div className="text-xs text-neutral-600">Loom walkthroughs, checklists, ongoing support for 30 days post-launch</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                    <h4 className="font-semibold text-neutral-900 mb-3">Success Criteria (30 Days Post-Launch)</h4>
+                    <ul className="space-y-2 text-sm text-neutral-700">
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Pipeline hygiene ≥90%</span> (all required fields populated, no stale opps)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Weekly forecast running</span> (≤20% variance from actuals)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Self-serve reporting</span> (leadership can pull KPIs without manual exports)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Rep adoption ≥95%</span> (logging activities, updating stages in real-time)</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-neutral-50 rounded-xl p-6">
+                    <h4 className="font-semibold text-neutral-900 mb-3">Common Pain Points We Fix</h4>
+                    <ul className="space-y-2 text-sm text-neutral-700">
+                      <li className="flex items-start">
+                        <span className="text-neutral-400 mr-2">→</span>
+                        <span>Pipeline meetings start with "let me pull the latest spreadsheet"</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-neutral-400 mr-2">→</span>
+                        <span>Reps have their own tracking systems outside the CRM</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-neutral-400 mr-2">→</span>
+                        <span>Board asks for pipeline breakdown and it takes 48 hours</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-neutral-400 mr-2">→</span>
+                        <span>CFO doesn't trust the forecast (and for good reason)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-neutral-400 mr-2">→</span>
+                        <span>Can't track conversion rates by stage or rep performance</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:border-l-2 lg:border-neutral-200 lg:pl-8">
+                <div className="bg-neutral-900 text-white rounded-xl p-6 mb-6">
+                  <div className="text-sm text-neutral-300 mb-2">Investment</div>
+                  <div className="text-4xl font-bold mb-4">$12K<span className="text-xl font-normal text-neutral-300"></span></div>
+                  <div className="text-sm text-neutral-300 leading-relaxed">
+                    Fixed fee; includes 30-day post-launch support
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Timeline</div>
+                    <div className="text-sm text-neutral-600">6 weeks (build) + 30 days (stabilisation support)</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Your Commitment</div>
+                    <div className="text-sm text-neutral-600">CRM admin access, 1 kickoff, 2 check-ins, team training session</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Best For</div>
+                    <ul className="text-sm text-neutral-600 space-y-1">
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Raising a round (need clean data)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Scaling past $2M ARR</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Forecast variance stressing the board</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>CRM migration or overhaul</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-5 my-6">
+                  <div className="text-xs font-bold text-blue-900 uppercase tracking-wider mb-3">RevOps Impact</div>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-neutral-600">Forecast accuracy</span>
+                        <span className="text-sm font-bold text-blue-900">±15%</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-neutral-600">Time saved (weekly)</span>
+                        <span className="text-sm font-bold text-blue-900">8-12 hrs</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-neutral-600">Data quality</span>
+                        <span className="text-sm font-bold text-blue-900">90%+</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 mb-6">
+                  <div className="text-xs font-semibold text-neutral-900 mb-2">Popular Add-Ons</div>
+                  <div className="space-y-2">
+                    <div className="text-sm text-neutral-600">+$2K for Salesforce → HubSpot migration</div>
+                    <div className="text-sm text-neutral-600">+$1.5K for custom API integrations</div>
+                  </div>
+                </div>
+
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                  <div className="text-xs font-semibold text-amber-900 mb-1">Combo Offer</div>
+                  <div className="text-xs text-amber-800">Bundle with GTM Sprint for $24K (save $3K)</div>
+                </div>
+
+                <a href="#contact" className="block w-full text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                  Start a Build
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Package 4: Sales Process Overhaul */}
+          <div className="bg-white border-2 border-neutral-200 rounded-2xl p-8 md:p-12 mb-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <div className="inline-block px-3 py-1 bg-purple-50 text-purple-800 text-xs font-semibold rounded-full mb-4 border border-purple-200">
+                  FIXED SCOPE · 3 WEEKS
+                </div>
+                <div className="flex items-center mb-4">
+                  <div className="bg-purple-100 rounded-xl p-3 mr-4 border-2 border-purple-200">
+                    <Target className="h-8 w-8 text-purple-700" />
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-bold text-neutral-900">
+                    Sales Process Overhaul
+                  </h3>
+                </div>
+                <p className="text-lg text-neutral-600 mb-6 leading-relaxed">
+                  The Methodology Rebuild
+                </p>
+
+                <div className="bg-neutral-50 rounded-xl p-6 mb-6">
+                  <h4 className="font-semibold text-neutral-900 mb-3">Ideal Fit</h4>
+                  <p className="text-neutral-700 text-sm leading-relaxed">
+                    Teams with <span className="font-semibold">inconsistent or nonexistent sales processes</span>. Reps wing every call, deals stall at the same stage, objections surprise you, and close rates vary wildly by person. You need <span className="font-semibold">repeatable frameworks</span> that match how construction buyers actually buy—not generic SaaS plays copy-pasted from a blog.
+                  </p>
+                </div>
+
+                <div className="space-y-6 mb-8">
+                  <div>
+                    <h4 className="font-semibold text-neutral-900 mb-3">Overhaul Deliverables</h4>
+                    <div className="space-y-3">
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">Discovery Framework</div>
+                        <div className="text-sm text-neutral-600">Question banks, pain hypothesis trees, stakeholder maps (tailored to ConTech buying committees)</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">Demo Methodology</div>
+                        <div className="text-sm text-neutral-600">Demo scripts, storylines, clickpath guardrails, objection pre-emption tactics</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">Objection Handling Library</div>
+                        <div className="text-sm text-neutral-600">Top 20 ConTech objections (e.g., "ROI is unclear," "change management risk") with rebuttals & proof points</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">Closing Playbook</div>
+                        <div className="text-sm text-neutral-600">Trial close techniques, proposal templates, negotiation guardrails, mutual close plans</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                    <h4 className="font-semibold text-neutral-900 mb-3">What You Get</h4>
+                    <ul className="space-y-2 text-sm text-neutral-700">
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Process documentation</span> (Notion/Confluence/Sharepoint)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Rep training session</span> (90 min live workshop + recordings)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Manager coaching guide</span> (how to reinforce new behaviors)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">30-day Q&A support</span> (async Slack/email)</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:border-l-2 lg:border-neutral-200 lg:pl-8">
+                <div className="bg-neutral-900 text-white rounded-xl p-6 mb-6">
+                  <div className="text-sm text-neutral-300 mb-2">Investment</div>
+                  <div className="text-4xl font-bold mb-4">$8K</div>
+                  <div className="text-sm text-neutral-300 leading-relaxed">
+                    Fixed fee
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Timeline</div>
+                    <div className="text-sm text-neutral-600">3 weeks from kickoff to training delivery</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Your Commitment</div>
+                    <div className="text-sm text-neutral-600">Kickoff call, 2 review sessions, attend training workshop</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Best For</div>
+                    <ul className="text-sm text-neutral-600 space-y-1">
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Reps "winging it" on every call</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Deals stalling at same stage</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Wide variance in rep performance</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Onboarding new reps taking 6+ months</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-5 my-6">
+                  <div className="text-xs font-bold text-blue-900 uppercase tracking-wider mb-3">Process Metrics</div>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-neutral-600">Win rate improvement</span>
+                        <span className="text-sm font-bold text-blue-900">+15-25%</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-neutral-600">Rep consistency</span>
+                        <span className="text-sm font-bold text-blue-900">30 days</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-neutral-600">Onboarding speed</span>
+                        <span className="text-sm font-bold text-blue-900">-50%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4 mb-6">
+                  <div className="text-xs font-semibold text-neutral-900 mb-2">Popular Add-On</div>
+                  <div className="text-sm text-neutral-600">+$2K for live call shadowing & feedback (3 sessions)</div>
+                </div>
+
+                <a href="#contact" className="block w-full text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                  Start Overhaul
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Package 5: Sales Hiring Sprint */}
+          <div className="bg-white border-2 border-neutral-200 rounded-2xl p-8 md:p-12 mb-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <div className="inline-block px-3 py-1 bg-teal-50 text-teal-800 text-xs font-semibold rounded-full mb-4 border border-teal-200">
+                  FIXED SCOPE · 2–3 WEEKS
+                </div>
+                <h3 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
+                  Sales Hiring Sprint
+                </h3>
+                <p className="text-lg text-neutral-600 mb-6 leading-relaxed">
+                  The Talent Hunt
+                </p>
+
+                <div className="bg-neutral-50 rounded-xl p-6 mb-6">
+                  <h4 className="font-semibold text-neutral-900 mb-3">Ideal Fit</h4>
+                  <p className="text-neutral-700 text-sm leading-relaxed">
+                    Teams hiring their <span className="font-semibold">first AE, first sales leader, or scaling from 1→3 reps</span> and don't know what "good" looks like in ConTech. You need <span className="font-semibold">clarity on role scope, realistic comp, and interview rigor</span>—not generic SaaS hiring advice that ignores construction's unique sales motion.
+                  </p>
+                </div>
+
+                <div className="space-y-6 mb-8">
+                  <div>
+                    <h4 className="font-semibold text-neutral-900 mb-3">Sprint Deliverables</h4>
+                    <div className="space-y-3">
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">Role Definition</div>
+                        <div className="text-sm text-neutral-600">JD template, must-have vs. nice-to-have skills, realistic quota sizing</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">Comp Benchmarking</div>
+                        <div className="text-sm text-neutral-600">ConTech-specific OTE ranges, split recommendations (50/50 vs. 60/40), ramp logic</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">Screening Framework</div>
+                        <div className="text-sm text-neutral-600">Phone screen questions, red/yellow/green flags, role play prompts</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">Interview Guide</div>
+                        <div className="text-sm text-neutral-600">Competency-based questions, scoring rubric, reference check template</div>
+                      </div>
+                      <div className="bg-white border-2 border-neutral-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1">30-Day Onboarding Blueprint</div>
+                        <div className="text-sm text-neutral-600">Week-by-week ramp plan, first wins roadmap, manager 1:1 guide</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                    <h4 className="font-semibold text-neutral-900 mb-3">What You Get</h4>
+                    <ul className="space-y-2 text-sm text-neutral-700">
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Complete hiring toolkit</span> (JD, interview guides, scorecards)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Comp benchmarking report</span> (ConTech-specific data)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">30-day onboarding plan</span> (accelerate time-to-value)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span>Optional: <span className="font-semibold">Resume screening</span> (+$1K) or <span className="font-semibold">interview participation</span> (+$1.5K)</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:border-l-2 lg:border-neutral-200 lg:pl-8">
+                <div className="bg-neutral-900 text-white rounded-xl p-6 mb-6">
+                  <div className="text-sm text-neutral-300 mb-2">Investment</div>
+                  <div className="text-4xl font-bold mb-4">$5K</div>
+                  <div className="text-sm text-neutral-300 leading-relaxed">
+                    Fixed fee (add-ons priced separately)
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Timeline</div>
+                    <div className="text-sm text-neutral-600">2–3 weeks (depends on role complexity)</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Your Commitment</div>
+                    <div className="text-sm text-neutral-600">Kickoff call, 1 review session, approve final deliverables</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Best For</div>
+                    <ul className="text-sm text-neutral-600 space-y-1">
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Hiring first AE or sales leader</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Scaling from 1→3+ reps</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Past bad hires (need better filters)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Unclear on "good" for ConTech</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-5 my-6">
+                  <div className="text-xs font-bold text-blue-900 uppercase tracking-wider mb-3">Hiring Outcomes</div>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-neutral-600">Time to productivity</span>
+                        <span className="text-sm font-bold text-blue-900">-40%</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-neutral-600">First-year attrition</span>
+                        <span className="text-sm font-bold text-blue-900">&lt;10%</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-neutral-600">Quality of hire score</span>
+                        <span className="text-sm font-bold text-blue-900">8.5+/10</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-amber-50 border-2 border-amber-200 rounded-lg p-4 mb-6">
+                  <div className="text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">The Stakes</div>
+                  <div className="text-sm text-neutral-700 mb-3">Average ConTech sales hire costs $80-120K in comp + 6-9 months ramp. Wrong hire = $150K+ loss.</div>
+                  <div className="text-xs text-neutral-600 pt-2 border-t border-amber-200">Framework calibrated for construction sales cycles—not generic B2B hiring playbooks.</div>
+                </div>
+
+                <a href="#contact" className="block w-full text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                  Start Sprint
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Package 6: Middle East Market Entry */}
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-8 md:p-12 mb-12">
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <div className="inline-block px-3 py-1 bg-amber-600 text-white text-xs font-semibold rounded-full mb-4">
+                  EXCLUSIVE · LIMITED AVAILABILITY
+                </div>
+                <h3 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
+                  Middle East Market Entry
+                </h3>
+                <p className="text-lg text-neutral-600 mb-6 leading-relaxed">
+                  The Regional Expansion Play
+                </p>
+
+                <div className="bg-white rounded-xl p-6 mb-6 border-2 border-amber-200">
+                  <h4 className="font-semibold text-neutral-900 mb-3">Ideal Fit</h4>
+                  <p className="text-neutral-700 text-sm leading-relaxed">
+                    ConTech companies (typically $1M+ ARR) with proven UK/US/European traction ready to expand into <span className="font-semibold">UAE, Saudi Arabia, or broader GCC</span>. You need <span className="font-semibold">data-driven ICP targeting, full-cycle sales execution by an on-ground specialist, and a proven regional GTM playbook</span>—not generic market research or warm intro promises.
+                  </p>
+                </div>
+
+                <div className="space-y-6 mb-8">
+                  <div>
+                    <h4 className="font-semibold text-neutral-900 mb-3">What I Bring</h4>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <div className="bg-white border-2 border-amber-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1 text-sm">Propensity-Based ICP Targeting</div>
+                        <div className="text-xs text-neutral-600">Data-driven identification of most likely buyers across GCC construction ecosystem</div>
+                      </div>
+                      <div className="bg-white border-2 border-amber-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1 text-sm">Full-Cycle Sales Ownership</div>
+                        <div className="text-xs text-neutral-600">On-ground sales specialist executes complete sales process from prospecting to close</div>
+                      </div>
+                      <div className="bg-white border-2 border-amber-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1 text-sm">Localised GTM Playbook</div>
+                        <div className="text-xs text-neutral-600">Proven messaging, pricing, and buying motion frameworks adapted for regional dynamics</div>
+                      </div>
+                      <div className="bg-white border-2 border-amber-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1 text-sm">Direct Outbound Execution</div>
+                        <div className="text-xs text-neutral-600">Systematic outreach to qualified prospects—no dependency on warm intros or referrals</div>
+                      </div>
+                      <div className="bg-white border-2 border-amber-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1 text-sm">In-Region Sales Presence</div>
+                        <div className="text-xs text-neutral-600">Based in Dubai/Riyadh—attend meetings, navigate cultural nuances, close deals on-ground</div>
+                      </div>
+                      <div className="bg-white border-2 border-amber-200 rounded-lg p-4">
+                        <div className="font-semibold text-neutral-900 mb-1 text-sm">Partnership & Channel Strategy</div>
+                        <div className="text-xs text-neutral-600">Identify, vet, and activate local resellers or integrators to amplify reach</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                    <h4 className="font-semibold text-neutral-900 mb-3">Typical Outcomes</h4>
+                    <ul className="space-y-2 text-sm text-neutral-700">
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">2–5 anchor customers</span> signed (pilots or paid contracts)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Qualified pipeline</span> of 30+ prospects actively engaged</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Partnership agreements</span> in place (reseller or integrator)</span>
+                      </li>
+                      <li className="flex items-start">
+                        <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span><span className="font-semibold">Local presence established</span> (6-month engagements only)</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:border-l-2 lg:border-amber-300 lg:pl-8">
+                <div className="bg-neutral-900 text-white rounded-xl p-6 mb-6">
+                  <div className="text-sm text-neutral-300 mb-2">Investment</div>
+                  <div className="text-4xl font-bold mb-4">$16–25K</div>
+                  <div className="text-sm text-neutral-300 leading-relaxed">
+                    Per month; includes ICP targeting, full-cycle execution, on-ground sales specialist
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Timeline</div>
+                    <div className="text-sm text-neutral-600">3–6 months (phased engagement)</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Availability</div>
+                    <div className="text-sm text-neutral-600">Limited to 2–3 clients annually</div>
+                  </div>
+
+                  <div>
+                    <div className="font-semibold text-neutral-900 mb-2">Best For</div>
+                    <ul className="text-sm text-neutral-600 space-y-1">
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>$1M+ ARR, proven UK/US/European traction</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Product-market fit validated</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Board/investor interest in MENA</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span>Zero existing regional presence</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-amber-100 border-2 border-amber-300 rounded-lg p-4">
+                    <div className="text-xs font-semibold text-amber-900 mb-2">Application Required</div>
+                    <div className="text-xs text-amber-800 leading-relaxed">Due to limited availability and relationship capital, I only take on 2–3 MENA engagements per year. Apply below for consideration.</div>
+                  </div>
+                </div>
+
+                <a href="#contact" className="block w-full text-center px-6 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors mt-8">
+                  Apply for Consideration
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Interactive Package Navigator */}
+          <div className="bg-blue-50 rounded-2xl p-8 md:p-12 border-2 border-blue-200 shadow-lg">
+            <div className="text-center mb-12">
+              <h3 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">Find Your Perfect Fit in 30 Seconds</h3>
+              <p className="text-lg text-neutral-700">Answer one question to get a personalized recommendation</p>
+            </div>
+
+            {/* Decision Tree - Premium Layout */}
+            <div className="grid lg:grid-cols-5 gap-6 mb-10 items-start">
+              {/* Stage-Based Selector */}
+              <div className="lg:col-span-2 bg-white rounded-xl p-6 border-2 border-blue-200 hover:border-blue-500 transition-all hover:shadow-lg h-full flex flex-col">
+                <div className="flex items-center mb-6">
+                  <div className="bg-blue-100 rounded-lg p-2.5 mr-3">
+                    <TrendingUp className="h-5 w-5 text-blue-700" />
+                  </div>
+                  <h4 className="text-xl font-bold text-neutral-900">By Company Stage</h4>
+                </div>
+                <div className="space-y-3 flex-1">
+                  <a href="#packages" className="block bg-neutral-50 hover:bg-blue-50 rounded-lg p-4 transition-all border-2 border-transparent hover:border-blue-400 hover:shadow-md group">
+                    <div className="font-semibold text-neutral-900 mb-2">Seed / Pre-Seed ($0–$1M ARR)</div>
+                    <div className="text-sm text-neutral-600">→ GTM Sprint or Advisory</div>
+                  </a>
+                  <a href="#packages" className="block bg-neutral-50 hover:bg-blue-50 rounded-lg p-4 transition-all border-2 border-transparent hover:border-blue-400 hover:shadow-md group">
+                    <div className="font-semibold text-neutral-900 mb-2">Early Stage ($500K–$2M ARR)</div>
+                    <div className="text-sm text-neutral-600">→ Fractional CRO – <span className="px-2 py-0.5 bg-blue-600 text-white text-xs font-bold rounded">LITE</span> or GTM Sprint</div>
+                  </a>
+                  <a href="#packages" className="block bg-neutral-50 hover:bg-blue-50 rounded-lg p-4 transition-all border-2 border-transparent hover:border-blue-400 hover:shadow-md group">
+                    <div className="font-semibold text-neutral-900 mb-2">Series A / Growth ($2M–$8M ARR)</div>
+                    <div className="text-sm text-neutral-600">→ Fractional CRO – <span className="px-2 py-0.5 bg-blue-600 text-white text-xs font-bold rounded">CORE</span> or RevOps Build</div>
+                  </a>
+                  <a href="#packages" className="block bg-neutral-50 hover:bg-blue-50 rounded-lg p-4 transition-all border-2 border-transparent hover:border-blue-400 hover:shadow-md group">
+                    <div className="font-semibold text-neutral-900 mb-2">Series B+ / Scale ($8M–$25M ARR)</div>
+                    <div className="text-sm text-neutral-600">→ Fractional CRO – <span className="px-2 py-0.5 bg-blue-700 text-white text-xs font-bold rounded">INTENSIVE</span></div>
+                  </a>
+                  <a href="#packages" className="block bg-neutral-50 hover:bg-blue-50 rounded-lg p-4 transition-all border-2 border-transparent hover:border-blue-400 hover:shadow-md group">
+                    <div className="font-semibold text-neutral-900 mb-2">Late Stage ($25M+ ARR)</div>
+                    <div className="text-sm text-neutral-600">→ Fractional CRO – <span className="px-2 py-0.5 bg-blue-700 text-white text-xs font-bold rounded">INTENSIVE</span> or Custom</div>
+                  </a>
+                </div>
+              </div>
+
+              {/* Problem-Based Selector - Single Column */}
+              <div className="lg:col-span-3 bg-white rounded-xl p-6 border-2 border-amber-300 hover:border-amber-400 transition-all hover:shadow-lg h-full flex flex-col">
+                <div className="flex items-center mb-6">
+                  <div className="bg-amber-100 rounded-lg p-2.5 mr-3">
+                    <Target className="h-5 w-5 text-amber-700" />
+                  </div>
+                  <h4 className="text-xl font-bold text-neutral-900">By Urgent Problem</h4>
+                </div>
+                <div className="grid md:grid-cols-2 gap-3 flex-1 auto-rows-fr">
+                  <a href="#packages" className="flex flex-col justify-center bg-amber-50/50 hover:bg-amber-100/80 rounded-lg p-4 transition-all border-2 border-transparent hover:border-amber-400 hover:shadow-md group h-full">
+                    <div className="font-bold text-neutral-900 mb-1.5 text-sm">Burning cash, narrowing runway</div>
+                    <div className="text-xs text-neutral-600 mb-2 leading-relaxed">Investors demand trajectory fix before next raise</div>
+                    <div className="text-xs text-blue-700 font-bold">→ CRO – <span className="px-1.5 py-0.5 bg-blue-600 text-white rounded">CORE</span> or <span className="px-1.5 py-0.5 bg-blue-700 text-white rounded">INTENSIVE</span></div>
+                  </a>
+                  <a href="#packages" className="flex flex-col justify-center bg-amber-50/50 hover:bg-amber-100/80 rounded-lg p-4 transition-all border-2 border-transparent hover:border-amber-400 hover:shadow-md group h-full">
+                    <div className="font-bold text-neutral-900 mb-1.5 text-sm">Stuck at founder-led sales ceiling</div>
+                    <div className="text-xs text-neutral-600 mb-2 leading-relaxed">Cannot scale past $2M ARR without professional sales motion</div>
+                    <div className="text-xs text-blue-700 font-bold">→ CRO – <span className="px-1.5 py-0.5 bg-blue-600 text-white rounded">CORE</span> + Sales Process Overhaul</div>
+                  </a>
+                  <a href="#packages" className="flex flex-col justify-center bg-amber-50/50 hover:bg-amber-100/80 rounded-lg p-4 transition-all border-2 border-transparent hover:border-amber-400 hover:shadow-md group h-full">
+                    <div className="font-bold text-neutral-900 mb-1.5 text-sm">Revenue unpredictable, board losing confidence</div>
+                    <div className="text-xs text-neutral-600 mb-2 leading-relaxed">Forecasts miss by 30%+, threatening founder control</div>
+                    <div className="text-xs text-blue-700 font-bold">→ CRO – <span className="px-1.5 py-0.5 bg-blue-600 text-white rounded">CORE</span> + RevOps Build</div>
+                  </a>
+                  <a href="#packages" className="flex flex-col justify-center bg-amber-50/50 hover:bg-amber-100/80 rounded-lg p-4 transition-all border-2 border-transparent hover:border-amber-400 hover:shadow-md group h-full">
+                    <div className="font-bold text-neutral-900 mb-1.5 text-sm">GTM dysfunction across teams</div>
+                    <div className="text-xs text-neutral-600 mb-2 leading-relaxed">Sales/Marketing/CS misaligned, no path to North Star metrics</div>
+                    <div className="text-xs text-blue-700 font-bold">→ GTM Sprint (4 weeks)</div>
+                  </a>
+                  <a href="#packages" className="flex flex-col justify-center bg-amber-50/50 hover:bg-amber-100/80 rounded-lg p-4 transition-all border-2 border-transparent hover:border-amber-400 hover:shadow-md group h-full">
+                    <div className="font-bold text-neutral-900 mb-1.5 text-sm">Pipeline visibility is a black box</div>
+                    <div className="text-xs text-neutral-600 mb-2 leading-relaxed">Can't forecast accurately, deals slip, reps flying blind</div>
+                    <div className="text-xs text-blue-700 font-bold">→ RevOps Build (6 weeks)</div>
+                  </a>
+                  <a href="#packages" className="flex flex-col justify-center bg-amber-50/50 hover:bg-amber-100/80 rounded-lg p-4 transition-all border-2 border-transparent hover:border-amber-400 hover:shadow-md group h-full">
+                    <div className="font-bold text-neutral-900 mb-1.5 text-sm">Hero sales culture, no repeatability</div>
+                    <div className="text-xs text-neutral-600 mb-2 leading-relaxed">One rep crushes quota, others struggle—no process</div>
+                    <div className="text-xs text-blue-700 font-bold">→ Sales Process Overhaul (3 weeks)</div>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Comparison */}
+            <div className="bg-neutral-900 rounded-xl p-8 border-2 border-neutral-800 text-white mb-10 shadow-lg">
+              <h4 className="font-bold text-xl mb-6 text-center">Quick Comparison</h4>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <div className="flex items-center mb-3">
+                    <Users className="h-5 w-5 text-blue-400 mr-2" />
+                    <div className="font-bold text-base">Ongoing Engagements</div>
+                  </div>
+                  <ul className="text-sm text-neutral-300 space-y-2 ml-7">
+                    <li>• Fractional CRO (<span className="px-2 py-0.5 bg-blue-600 text-white text-xs font-bold rounded">LITE</span>, <span className="px-2 py-0.5 bg-blue-600 text-white text-xs font-bold rounded">CORE</span>, <span className="px-2 py-0.5 bg-blue-700 text-white text-xs font-bold rounded">INTENSIVE</span>)</li>
+                    <li>• Continuous leadership & execution</li>
+                    <li>• 3+ month commitments</li>
+                  </ul>
+                </div>
+                <div>
+                  <div className="flex items-center mb-3">
+                    <Zap className="h-5 w-5 text-amber-400 mr-2" />
+                    <div className="font-bold text-base">Fixed-Scope Projects</div>
+                  </div>
+                  <ul className="text-sm text-neutral-300 space-y-2 ml-7">
+                    <li>• GTM Sprint, RevOps Build, Process Overhaul</li>
+                    <li>• Defined deliverables & timeline</li>
+                    <li>• 3-6 week sprints</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="text-center pt-8 border-t-2 border-blue-200">
+              <p className="text-neutral-700 mb-6 text-lg">Still not sure? Let's diagnose your situation together.</p>
+              <a href="#contact" className="inline-flex items-center justify-center px-10 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl text-lg">
+                Schedule Free 30-Min Strategy Call
+                <ArrowRight className="ml-3 h-5 w-5" />
+              </a>
+              <p className="text-xs text-neutral-500 mt-3">No pitch. No obligation. Just honest guidance.</p>
+            </div>
+          </div>
+
+          {/* Add-On Services - Prominent Design */}
+          <div className="mt-16 bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-8 md:p-12 border-2 border-amber-200 shadow-xl">
+            <div className="text-center mb-10">
+              <div className="inline-block px-4 py-2 bg-amber-500 text-white text-xs font-bold rounded-full mb-4">
+                POPULAR ADD-ONS
+              </div>
+              <h3 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
+                Turbocharge Any Package
+              </h3>
+              <p className="text-lg text-neutral-700 max-w-2xl mx-auto">
+                High-impact services you can add to any engagement for immediate results
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              {/* Add-On 1 */}
+              <div className="bg-white rounded-xl p-6 border-2 border-amber-200 hover:border-amber-400 transition-all hover:shadow-lg">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start">
+                    <div className="bg-amber-100 rounded-lg p-3 mr-4">
+                      <Users className="h-6 w-6 text-amber-700" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-neutral-900 text-lg mb-1">Sales Hiring Support</h4>
+                      <p className="text-sm text-neutral-600">JD writing, screening rubrics, interview guides, offer negotiation</p>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-amber-700 whitespace-nowrap ml-4">$2K</div>
+                </div>
+                <div className="text-xs text-neutral-500 mt-3">
+                  <Clock className="h-3 w-3 inline mr-1" />
+                  1-2 weeks
+                </div>
+              </div>
+
+              {/* Add-On 2 */}
+              <div className="bg-white rounded-xl p-6 border-2 border-amber-200 hover:border-amber-400 transition-all hover:shadow-lg">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start">
+                    <div className="bg-amber-100 rounded-lg p-3 mr-4">
+                      <Shield className="h-6 w-6 text-amber-700" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-neutral-900 text-lg mb-1">Deal Rescue</h4>
+                      <p className="text-sm text-neutral-600">1:1 coaching to unstick $50K+ opportunities in final stages</p>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-amber-700 whitespace-nowrap ml-4">$1.5K</div>
+                </div>
+                <div className="text-xs text-neutral-500 mt-3">
+                  <Clock className="h-3 w-3 inline mr-1" />
+                  Same week
+                </div>
+              </div>
+
+              {/* Add-On 3 */}
+              <div className="bg-white rounded-xl p-6 border-2 border-amber-200 hover:border-amber-400 transition-all hover:shadow-lg">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start">
+                    <div className="bg-amber-100 rounded-lg p-3 mr-4">
+                      <BarChart3 className="h-6 w-6 text-amber-700" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-neutral-900 text-lg mb-1">Board Deck Build</h4>
+                      <p className="text-sm text-neutral-600">Revenue narrative, metrics design, investor-ready slides</p>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-amber-700 whitespace-nowrap ml-4">$3K</div>
+                </div>
+                <div className="text-xs text-neutral-500 mt-3">
+                  <Clock className="h-3 w-3 inline mr-1" />
+                  5-7 days
+                </div>
+              </div>
+
+              {/* Add-On 4 */}
+              <div className="bg-white rounded-xl p-6 border-2 border-amber-200 hover:border-amber-400 transition-all hover:shadow-lg">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start">
+                    <div className="bg-amber-100 rounded-lg p-3 mr-4">
+                      <DollarSign className="h-6 w-6 text-amber-700" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-neutral-900 text-lg mb-1">Sales Comp Plan Design</h4>
+                      <p className="text-sm text-neutral-600">OTE structure, accelerators, clawbacks, quota modeling</p>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-amber-700 whitespace-nowrap ml-4">$2.5K</div>
+                </div>
+                <div className="text-xs text-neutral-500 mt-3">
+                  <Clock className="h-3 w-3 inline mr-1" />
+                  1-2 weeks
+                </div>
+              </div>
+            </div>
+
+            {/* Custom Engagements CTA */}
+            <div className="bg-neutral-900 text-white rounded-xl p-8 text-center">
+              <div className="flex items-center justify-center mb-4">
+                <Wrench className="h-8 w-8 text-amber-400 mr-3" />
+                <h4 className="text-2xl font-bold">Need Something Custom?</h4>
+              </div>
+              <p className="text-neutral-300 mb-6 max-w-2xl mx-auto">
+                I offer bespoke engagements for M&A due diligence, multi-geo expansion, vertical-specific plays (GC-focused, subcontractor platforms, materials marketplaces), and other specialized ConTech scenarios.
+              </p>
+              <a href="#contact" className="inline-flex items-center px-8 py-3 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600 transition-all shadow-lg">
+                Discuss Custom Scope
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </a>
+            </div>
+          </div>
+        </div>
+          </div>
+          {/* End Collapsible Section */}
+      </section>
+
+      {/* Results/Case Studies Section */}
+      <section id="results" className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="max-w-3xl mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-6">
+              Results That Speak for Themselves
+            </h2>
+            <p className="text-xl text-neutral-600">
+              Real outcomes from real ConTech companies. Situation → Action → Results.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Case Study 1 */}
+            <div className="bg-neutral-50 rounded-2xl p-8 border-2 border-neutral-200">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-12 h-12 bg-neutral-200 rounded-lg flex items-center justify-center">
+                  <Building2 className="h-6 w-6 text-neutral-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-neutral-900">Early-Stage ConTech SaaS</div>
+                  <div className="text-sm text-neutral-500">Project Management Platform</div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-bold text-neutral-900 mb-2 flex items-center">
+                    <span className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center text-sm mr-3">S</span>
+                    Situation
+                  </h4>
+                  <p className="text-neutral-600 ml-11">
+                    Stuck at $800K ARR for 8 months. Inefficient sales process, unclear ICP, and 65% sales cycle variance. Team of 3 struggling to close enterprise deals.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-neutral-900 mb-2 flex items-center">
+                    <span className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center text-sm mr-3">A</span>
+                    Action
+                  </h4>
+                  <p className="text-neutral-600 ml-11">
+                    Rebuilt GTM from ground up: refined ICP to mid-market GCs, implemented MEDDIC sales methodology, restructured demo flow, and established revenue operations foundation.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-neutral-900 mb-2 flex items-center">
+                    <span className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm text-white mr-3">R</span>
+                    Results
+                  </h4>
+                  <div className="ml-11 space-y-2">
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                      <span className="text-neutral-700">ARR Growth</span>
+                      <span className="font-bold text-neutral-900">$800K → $2.4M</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                      <span className="text-neutral-700">Close Rate</span>
+                      <span className="font-bold text-neutral-900">+180%</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                      <span className="text-neutral-700">Outcome</span>
+                      <span className="font-bold text-neutral-900">Series A Ready</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Case Study 2 */}
+            <div className="bg-neutral-50 rounded-2xl p-8 border-2 border-neutral-200">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-12 h-12 bg-neutral-200 rounded-lg flex items-center justify-center">
+                  <Target className="h-6 w-6 text-neutral-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-neutral-900">Growth-Stage PropTech</div>
+                  <div className="text-sm text-neutral-500">Commercial Real Estate Analytics</div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-bold text-neutral-900 mb-2 flex items-center">
+                    <span className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center text-sm mr-3">S</span>
+                    Situation
+                  </h4>
+                  <p className="text-neutral-600 ml-11">
+                    Post-Series A plateau at $4.5M ARR. High churn (28%), stalled pipeline, and misaligned sales/marketing. Board pressure for growth acceleration.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-neutral-900 mb-2 flex items-center">
+                    <span className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center text-sm mr-3">A</span>
+                    Action
+                  </h4>
+                  <p className="text-neutral-600 ml-11">
+                    Implemented customer success framework, launched expansion revenue playbook, realigned sales comp structure, and established predictable pipeline model with RevOps.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-neutral-900 mb-2 flex items-center">
+                    <span className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm text-white mr-3">R</span>
+                    Results
+                  </h4>
+                  <div className="ml-11 space-y-2">
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                      <span className="text-neutral-700">ARR Growth</span>
+                      <span className="font-bold text-neutral-900">$4.5M → $9.8M</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                      <span className="text-neutral-700">Churn Reduction</span>
+                      <span className="font-bold text-neutral-900">28% → 12%</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                      <span className="text-neutral-700">Timeline</span>
+                      <span className="font-bold text-neutral-900">18 Months</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Case Study 3 */}
+            <div className="bg-neutral-50 rounded-2xl p-8 border-2 border-neutral-200">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-12 h-12 bg-neutral-200 rounded-lg flex items-center justify-center">
+                  <Globe className="h-6 w-6 text-neutral-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-neutral-900">ConTech Startup</div>
+                  <div className="text-sm text-neutral-500">Middle East Expansion</div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-bold text-neutral-900 mb-2 flex items-center">
+                    <span className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center text-sm mr-3">S</span>
+                    Situation
+                  </h4>
+                  <p className="text-neutral-600 ml-11">
+                    Strong US traction ($3M ARR) but zero Middle East presence. No regional partnerships, limited market knowledge, and risk-averse for international expansion.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-neutral-900 mb-2 flex items-center">
+                    <span className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center text-sm mr-3">A</span>
+                    Action
+                  </h4>
+                  <p className="text-neutral-600 ml-11">
+                    Leveraged 20+ years of regional relationships to establish strategic partnerships, adapted GTM for local buying behaviours, and secured 3 anchor customers in UAE and KSA.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-neutral-900 mb-2 flex items-center">
+                    <span className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm text-white mr-3">R</span>
+                    Results
+                  </h4>
+                  <div className="ml-11 space-y-2">
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                      <span className="text-neutral-700">New Market ARR</span>
+                      <span className="font-bold text-neutral-900">$1.2M</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                      <span className="text-neutral-700">Enterprise Deals</span>
+                      <span className="font-bold text-neutral-900">7 Signed</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                      <span className="text-neutral-700">Time to First Deal</span>
+                      <span className="font-bold text-neutral-900">4 Months</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats Card - Enhanced Overall Impact */}
+            <div className="bg-neutral-900 text-white rounded-2xl p-8 border border-neutral-800">
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center mr-3">
+                  <BarChart3 className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold">Overall Impact</h3>
+              </div>
+
+              {/* Primary Stats Grid */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                  <div className="text-3xl font-bold mb-1 text-white">20+</div>
+                  <div className="text-sm text-neutral-400">Years ConTech Experience</div>
+                </div>
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                  <div className="text-3xl font-bold mb-1 text-white">$50M+</div>
+                  <div className="text-sm text-neutral-400">Revenue Generated</div>
+                </div>
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                  <div className="text-3xl font-bold mb-1 text-white">15+</div>
+                  <div className="text-sm text-neutral-400">Companies Scaled</div>
+                </div>
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                  <div className="text-3xl font-bold mb-1 text-white">3x</div>
+                  <div className="text-sm text-neutral-400">Avg Revenue Growth</div>
+                </div>
+              </div>
+
+              {/* Key Achievements */}
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start bg-white/5 rounded-lg p-3 border border-white/10">
+                  <TrendingUp className="h-4 w-4 text-white mr-2 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-neutral-200">Built sales orgs from $0 - $150M</span>
+                </div>
+                <div className="flex items-start bg-white/5 rounded-lg p-3 border border-white/10">
+                  <Rocket className="h-4 w-4 text-white mr-2 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-neutral-200">Led 3 successful exits in ConTech space</span>
+                </div>
+                <div className="flex items-start bg-white/5 rounded-lg p-3 border border-white/10">
+                  <Globe className="h-4 w-4 text-white mr-2 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-neutral-200">Deep Middle East market expertise</span>
+                </div>
+              </div>
+
+              {/* Core Expertise */}
+              <div className="pt-4 border-t border-white/10">
+                <div className="text-xs font-semibold text-neutral-400 mb-3 uppercase tracking-wider">Core Expertise</div>
+                <div className="flex flex-wrap gap-2">
+                  <div className="px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-xs font-medium text-neutral-200">
+                    Seed &gt;&gt; Series B
+                  </div>
+                  <div className="px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-xs font-medium text-neutral-200">
+                    GTM Strategy
+                  </div>
+                  <div className="px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-xs font-medium text-neutral-200">
+                    Revenue Acceleration
+                  </div>
+                  <div className="px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-xs font-medium text-neutral-200">
+                    Sales Team Transformation
+                  </div>
+                  <div className="px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-xs font-medium text-neutral-200">
+                    Board Savvy
+                  </div>
+                  <div className="px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-xs font-medium text-neutral-200">
+                    Founder-Friendly
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA - Transition to Pricing */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-neutral-900 to-neutral-800 text-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-block px-4 py-2 bg-white/10 text-white text-xs font-bold rounded-full mb-4 uppercase tracking-wider">
+            Ready to Fix Your Revenue Engine?
+          </div>
+          <h3 className="text-3xl md:text-4xl font-bold mb-4">
+            Let's Talk Engagement Models & Pricing
+          </h3>
+          <p className="text-lg text-neutral-300 mb-8 max-w-2xl mx-auto">
+            From strategic advisory to full revenue transformation—choose the engagement model that fits your stage, budget, and time horizon.
+          </p>
+          <a href="#pricing" className="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]">
+            View Pricing & Packages
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </a>
+        </div>
+      </section>
+
+      {/* Why Understanding Construction Buyers Matters */}
+      <section id="why-me" className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-16 text-center max-w-4xl mx-auto">
+            {/* Buyer Expertise Badge Strip */}
+            <div className="flex flex-wrap justify-center items-center gap-3 mb-8">
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full">
+                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">🏢</span>
+                </div>
+                <span className="text-sm font-medium text-neutral-800">Asset Owners</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full">
+                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">🏗️</span>
+                </div>
+                <span className="text-sm font-medium text-neutral-800">Main Contractors</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full">
+                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">📋</span>
+                </div>
+                <span className="text-sm font-medium text-neutral-800">Consultants/PMs</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full">
+                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">📐</span>
+                </div>
+                <span className="text-sm font-medium text-neutral-800">Architects</span>
+              </div>
+            </div>
+            <div className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-full mb-6">
+              Deep Sales Execution Experience Across All Buyer Personas
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-6">
+              Why Understanding Construction Buyers Matters
+            </h2>
+            <p className="text-xl text-neutral-600 leading-relaxed">
+              Construction isn't like other industries. Buyers are deeply risk-averse, operate on razor-thin margins, and trust peer recommendations over polished marketing. Understanding their psychology is the difference between a stalled pipeline and predictable revenue.
+            </p>
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            {/* Section 1: The Construction Buyer's Mindset */}
+            <div className="bg-white rounded-2xl p-8 border-2 border-neutral-200">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mr-4">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-neutral-900">
+                  The Construction Buyer's Mindset
+                </h3>
+              </div>
+              <p className="text-neutral-600 leading-relaxed mb-6">
+                Construction professionals operate in a world of tangible assets, physical consequences, and public accountability. Unlike software buyers who can test and iterate, construction buyers face permanent, expensive decisions.
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-neutral-900 mb-1">Risk First, ROI Second</h4>
+                    <p className="text-sm text-neutral-600">
+                      A bad software purchase costs money. A bad construction decision can delay projects, break budgets, or damage reputations.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-neutral-900 mb-1">Peer Trust Network</h4>
+                    <p className="text-sm text-neutral-600">
+                      Builders trust other builders. A referral from a peer carries 10x the weight of any sales pitch.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-neutral-900 mb-1">Show, Don't Tell</h4>
+                    <p className="text-sm text-neutral-600">
+                      Construction buyers want proof—job site photos, reference projects, and concrete ROI metrics, not marketing promises.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 2: Why Traditional B2B Playbooks Fail */}
+            <div className="bg-white rounded-2xl p-8 border-2 border-neutral-200">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center mr-4">
+                  <Target className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-neutral-900">
+                  Why Traditional B2B Playbooks Fail
+                </h3>
+              </div>
+              <p className="text-neutral-600 leading-relaxed mb-6">
+                Most SaaS GTM strategies assume buyers are digital-first, familiar with subscription models, and responsive to content marketing. Construction buyers are different.
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <div className="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-amber-600"></div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-neutral-900 mb-1">Spray-and-pray outbound fails</h4>
+                    <p className="text-sm text-neutral-600">
+                      Generic emails get ignored. Buyers need proof you understand their specific project type and constraints.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-amber-600"></div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-neutral-900 mb-1">Long sales cycles are normal</h4>
+                    <p className="text-sm text-neutral-600">
+                      Construction buying committees are slow, deliberate, and consensus-driven. Rushing creates resistance.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-amber-600"></div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-neutral-900 mb-1">Product-led growth doesn't work</h4>
+                    <p className="text-sm text-neutral-600">
+                      Free trials rarely convert because adoption requires behavior change across teams, not individual experimentation.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* What Works Instead - Full Width */}
+          <div className="bg-white rounded-2xl p-8 md:p-10 border-2 border-neutral-200 mb-12">
+            <div className="flex items-center mb-8">
+              <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mr-4">
+                <Zap className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-neutral-900">
+                What Works Instead
+              </h3>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-neutral-50 rounded-xl p-6">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                  <span className="text-green-600 font-bold text-lg">1</span>
+                </div>
+                <h4 className="font-semibold text-neutral-900 mb-2 text-lg">Vertical Credibility</h4>
+                <p className="text-neutral-600 leading-relaxed">
+                  Demonstrate deep understanding of their specific segment—residential, commercial, infrastructure. Use their language, know their pain points.
+                </p>
+              </div>
+              <div className="bg-neutral-50 rounded-xl p-6">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                  <span className="text-green-600 font-bold text-lg">2</span>
+                </div>
+                <h4 className="font-semibold text-neutral-900 mb-2 text-lg">Peer-Driven Pipeline</h4>
+                <p className="text-neutral-600 leading-relaxed">
+                  Build systematic referral engines, customer advisory boards, and co-marketing programs. Let happy customers sell for you.
+                </p>
+              </div>
+              <div className="bg-neutral-50 rounded-xl p-6">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                  <span className="text-green-600 font-bold text-lg">3</span>
+                </div>
+                <h4 className="font-semibold text-neutral-900 mb-2 text-lg">Field-Tested Proof</h4>
+                <p className="text-neutral-600 leading-relaxed">
+                  Case studies with real project metrics, ROI calculators anchored to their economics, and pilot programs that de-risk adoption.
+                </p>
+              </div>
+            </div>
+
+            {/* Bottom Line Callout */}
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200">
+              <p className="text-neutral-900 leading-relaxed text-lg">
+                <span className="font-bold text-blue-900">Bottom line:</span> Construction GTM requires patient, consultative selling backed by ironclad credibility. You're not selling software—you're selling risk mitigation and operational certainty. Get the buyer psychology right, and you unlock a loyal, high-LTV customer base that sticks for decades.
+              </p>
+            </div>
+          </div>
+
+          {/* How Each Buyer Type Derails Pipelines */}
+          <div className="mb-12">
+            <div className="text-center mb-10">
+              <div className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-full mb-4">
+                Buyer-Specific Failure Patterns
+              </div>
+              <h3 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
+                How Each Buyer Type Derails Pipelines
+              </h3>
+              <p className="text-lg text-neutral-600 max-w-3xl mx-auto">
+                Your reps struggle with construction buyers because they don't understand the specific failure patterns each persona creates. Here's what I've learned from closing millions in ARR across these buyer types.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Asset Owners/Developers */}
+              <div className="bg-white border-l-4 border-blue-600 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">🏢</span>
+                  </div>
+                  <h4 className="text-xl font-bold text-neutral-900">Asset Owners / Developers</h4>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">The Failure Pattern</div>
+                    <p className="text-neutral-900 font-semibold text-base">18-month cycles that die in committee after initial excitement</p>
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">Why This Happens</div>
+                    <p className="text-neutral-600 text-sm leading-relaxed">Owners involve finance (CapEx treatment), legal (contract risk), asset management (tenant impact), and operations (implementation). Each stakeholder has veto power. One unaddressed objection kills the deal—and your reps don't map these landmines upfront.</p>
+                  </div>
+                  <div className="pt-4 border-t border-neutral-200">
+                    <div className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">How I Navigate This</div>
+                    <p className="text-neutral-700 text-sm leading-relaxed">I map all stakeholders in week one, run parallel conversations addressing each concern (finance gets CapEx models, legal gets liability frameworks, ops gets change management plans), and secure a C-level executive sponsor who can break committee gridlock.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Contractors/GCs */}
+              <div className="bg-white border-l-4 border-amber-600 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">🏗️</span>
+                  </div>
+                  <h4 className="text-xl font-bold text-neutral-900">Main Contractors / GCs</h4>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-xs font-bold text-amber-600 uppercase tracking-wider mb-2">The Failure Pattern</div>
+                    <p className="text-neutral-900 font-semibold text-base">Pilots succeed on paper, never convert to enterprise rollout</p>
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">Why This Happens</div>
+                    <p className="text-neutral-600 text-sm leading-relaxed">Procurement signed based on efficiency promises, but site teams and PMs never adopted the tool. Now procurement looks stupid to leadership, and they ghost you. Your reps celebrate the pilot "win" without pre-wiring adoption—then wonder why enterprise deals evaporate.</p>
+                  </div>
+                  <div className="pt-4 border-t border-neutral-200">
+                    <div className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">How I Navigate This</div>
+                    <p className="text-neutral-700 text-sm leading-relaxed">I identify site-level champions (PM or superintendent) before contracts are signed, build adoption KPIs into pilot agreements (% of team using tool, specific workflow completions), and run weekly site check-ins. When pilots succeed with documented adoption proof, enterprise rollout is pre-wired.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Consultants/PMs */}
+              <div className="bg-white border-l-4 border-neutral-400 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-12 h-12 bg-neutral-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">📋</span>
+                  </div>
+                  <h4 className="text-xl font-bold text-neutral-900">Consultants / PMs</h4>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">The Failure Pattern</div>
+                    <p className="text-neutral-900 font-semibold text-base">"Adoption theatre"—sign contracts, attend kickoff, then disappear</p>
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">Why This Happens</div>
+                    <p className="text-neutral-600 text-sm leading-relaxed">Consultants are influence players with zero budget authority and massive professional liability exposure. If they recommend your tool and it fails, they look incompetent to their client (the actual buyer). So they hedge—soft commit, never implement. Your reps mistake interest for intent.</p>
+                  </div>
+                  <div className="pt-4 border-t border-neutral-200">
+                    <div className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">How I Navigate This</div>
+                    <p className="text-neutral-700 text-sm leading-relaxed">I don't sell them software—I position your solution as a "client deliverable enhancement" that makes them the hero. I address professional liability upfront with proof points and insurance frameworks, provide white-label deliverables they can present to clients, and create referral incentives that align with their business model.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Architects */}
+              <div className="bg-white border-l-4 border-neutral-400 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-12 h-12 bg-neutral-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">📐</span>
+                  </div>
+                  <h4 className="text-xl font-bold text-neutral-900">Architects</h4>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">The Failure Pattern</div>
+                    <p className="text-neutral-900 font-semibold text-base">Love your solution, advocate for it—but can't buy it. Deals stall indefinitely.</p>
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">Why This Happens</div>
+                    <p className="text-neutral-600 text-sm leading-relaxed">Architects influence specifications but rarely control budgets. They're tastemakers without purchasing power. The actual buyer is the GC or owner, and your reps waste months nurturing architect relationships that can't close deals. Spec influence ≠ revenue.</p>
+                  </div>
+                  <div className="pt-4 border-t border-neutral-200">
+                    <div className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">How I Navigate This</div>
+                    <p className="text-neutral-700 text-sm leading-relaxed">I don't try to close architects—I activate them as influencers. I help them build spec language that favors your solution, position them as advocates to the actual buyer (GC/owner), provide design integration tools that ease their workflow, and create co-marketing case studies they can leverage for client development.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Deep Dive: 14 Key Insights */}
+          <div className="bg-neutral-900 rounded-2xl p-8 md:p-10">
+            <div className="mb-8 text-center">
+              <div className="inline-block px-4 py-2 bg-white/10 text-white text-sm font-medium rounded-full mb-4">
+                Deep Dive
+              </div>
+              <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                14 Critical Insights for ConTech GTM Success
+              </h3>
+              <p className="text-neutral-300 text-lg">
+                The complete playbook for understanding and selling to construction buyers
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Insight 1 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">1</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Construction Buyers Are Different Animals</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  Tech buyers iterate; construction buyers commit. A bad purchase in software is recoverable. A bad decision on a job site is public, permanent, and expensive.
+                </p>
+              </div>
+
+              {/* Insight 2 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">2</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Peer Recommendations &gt; Marketing Noise</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  Construction is an apprenticeship industry. Buyers trust people they've worked with over polished case studies. Your referral network IS your pipeline.
+                </p>
+              </div>
+
+              {/* Insight 3 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">3</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Risk Mitigation Beats ROI</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  Don't lead with "10x efficiency." Lead with "We won't screw up your project." Safety, reliability, and predictability close deals.
+                </p>
+              </div>
+
+              {/* Insight 4 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">4</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Spray-and-Pray Email Fails Spectacularly</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  Generic outbound gets you blacklisted. Prove you know their vertical, their pain, and their project type before hitting send.
+                </p>
+              </div>
+
+              {/* Insight 5 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">5</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Sales Cycles Are Long—Get Used to It</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  Construction buying committees move at geology speed. Slow, consensus-driven, deliberate. Rushing kills deals.
+                </p>
+              </div>
+
+              {/* Insight 6 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">6</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">PLG Doesn't Work Here</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  Free trials don't convert. Adoption requires team behavior change, not solo experimentation. Go consultative or go home.
+                </p>
+              </div>
+
+              {/* Insight 7 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">7</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Vertical Credibility Is Non-Negotiable</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  Residential vs. commercial vs. infrastructure—each has different economics, pain points, and buying behaviours. Speak their language or lose.
+                </p>
+              </div>
+
+              {/* Insight 8 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">8</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Build a Peer-Driven Pipeline</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  Systematic referrals, customer advisory boards, and co-marketing turn happy customers into your best salespeople.
+                </p>
+              </div>
+
+              {/* Insight 9 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">9</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Show Proof, Not Promises</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  Job site photos, reference projects, ROI calculators anchored to their real economics. Tangible evidence beats marketing fluff.
+                </p>
+              </div>
+
+              {/* Insight 10 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">10</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Pilot Programs De-Risk Adoption</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  Offer low-stakes trials on non-critical projects. Let them test without betting the farm. Success stories follow.
+                </p>
+              </div>
+
+              {/* Insight 11 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">11</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Patient, Consultative Selling Wins</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  You're not selling software. You're selling risk mitigation and operational certainty. Act like a trusted advisor, not a vendor.
+                </p>
+              </div>
+
+              {/* Insight 12 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">12</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Margins Are Thin—Every Dollar Counts</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  Construction runs on 2-5% margins. Your pricing must respect that reality. ROI must be crystal clear and defensible.
+                </p>
+              </div>
+
+              {/* Insight 13 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">13</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Get the Psychology Right = Loyal Customers</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  Construction buyers stick with what works. Earn their trust, deliver results, and you'll have a customer for decades.
+                </p>
+              </div>
+
+              {/* Insight 14 */}
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-white font-bold text-sm">14</span>
+                  </div>
+                  <h4 className="font-semibold text-white text-lg">Ironclad Credibility Is Your Competitive Moat</h4>
+                </div>
+                <p className="text-neutral-300 leading-relaxed">
+                  In an industry built on relationships and reputation, your track record is everything. Protect it ruthlessly.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA - Transition to Results */}
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-amber-50 to-amber-100">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-lg font-semibold text-neutral-900 mb-3">
+            Now that you see I understand your buyers...
+          </p>
+          <h3 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-6">
+            Here's What Happens When I Apply This Knowledge
+          </h3>
+          <a href="#results" className="inline-flex items-center px-6 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-all shadow-md hover:shadow-lg">
+            View Results & Case Studies
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </a>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-16 text-center">
+            What Founders & Investors Say
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-neutral-50 rounded-2xl p-8 border-2 border-neutral-200">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-neutral-200 rounded-full mr-4"></div>
+                <div>
+                  <div className="font-semibold text-neutral-900">Sarah Chen</div>
+                  <div className="text-sm text-neutral-500">CEO, ConTech SaaS</div>
+                </div>
+              </div>
+              <p className="text-neutral-600 leading-relaxed">
+                "Mohammad didn't just fix our sales process—he rebuilt our entire GTM from the ground up. We went from chaos to predictable pipeline in 90 days. Best investment we made."
+              </p>
+            </div>
+
+            <div className="bg-neutral-50 rounded-2xl p-8 border-2 border-neutral-200">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-neutral-200 rounded-full mr-4"></div>
+                <div>
+                  <div className="font-semibold text-neutral-900">David Morrison</div>
+                  <div className="text-sm text-neutral-500">Partner, Venture Capital</div>
+                </div>
+              </div>
+              <p className="text-neutral-600 leading-relaxed">
+                "We bring Mohammad into our portfolio companies when they need serious revenue leadership. His ConTech expertise is unmatched. He speaks founder and investor fluently."
+              </p>
+            </div>
+
+            <div className="bg-neutral-50 rounded-2xl p-8 border-2 border-neutral-200">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-neutral-200 rounded-full mr-4"></div>
+                <div>
+                  <div className="font-semibold text-neutral-900">James Taylor</div>
+                  <div className="text-sm text-neutral-500">Founder, PropTech Platform</div>
+                </div>
+              </div>
+              <p className="text-neutral-600 leading-relaxed">
+                "The Middle East expansion would have taken us years to figure out alone. Mohammad's network and market knowledge accelerated everything. We closed 3 enterprise deals in 6 months."
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-16 px-4 sm:px-6 lg:px-8 bg-neutral-50">
+        <div className="max-w-7xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-10">
+            <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-3">
+              Meet Mohammad Daudi
+            </h2>
+            <div className="w-20 h-1 bg-blue-600 mx-auto"></div>
+          </div>
+
+          {/* Two Column Layout - Tighter */}
+          <div className="grid lg:grid-cols-2 gap-6 items-start">
+            {/* Left Column - Photo */}
+            <div className="lg:sticky lg:top-24">
+              <div className="aspect-[4/5] bg-gradient-to-br from-neutral-200 to-neutral-300 rounded-xl overflow-hidden shadow-md">
+                <img
+                  src="/Mohammad Daudi (1).png"
+                  alt="Mohammad Daudi - Fractional CRO"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            {/* Right Column - Content */}
+            <div className="space-y-6">
+              {/* Bio */}
+              <div className="bg-white border border-neutral-200 rounded-xl p-6 shadow-sm">
+                <div className="space-y-4 text-base text-neutral-700 leading-relaxed">
+                  <p className="font-semibold text-neutral-900">
+                    I've spent 20+ years building revenue engines for ConTech and PropTech companies. I know the construction buyer. I speak investor. I build revenue machines that scale.
+                  </p>
+                  <p>
+                    Most fractional CROs bring generic SaaS playbooks. I bring deep ConTech domain expertise—from understanding 90-day payment cycles to navigating complex stakeholder buying committees with PMs, superintendents, and CFOs.
+                  </p>
+                  <p>
+                    I've helped companies go from stalled growth to Series A, from Series A to dominant market positions, and from zero to market leader in the Middle East.
+                  </p>
+                  <p className="text-lg font-semibold text-neutral-900 pt-2">
+                    If you're a ConTech CEO tired of generic advice and ready for someone who understands your buyer, let's talk.
+                  </p>
+                </div>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="text-center p-3 bg-white rounded-lg border border-neutral-200 shadow-sm">
+                  <Zap className="h-5 w-5 text-blue-600 mx-auto mb-1.5" />
+                  <div className="text-xs font-semibold text-neutral-900">ConTech Specialist</div>
+                </div>
+                <div className="text-center p-3 bg-white rounded-lg border border-neutral-200 shadow-sm">
+                  <Globe className="h-5 w-5 text-blue-600 mx-auto mb-1.5" />
+                  <div className="text-xs font-semibold text-neutral-900">UKI & EMEA Expert</div>
+                </div>
+                <div className="text-center p-3 bg-white rounded-lg border border-neutral-200 shadow-sm">
+                  <TrendingUp className="h-5 w-5 text-blue-600 mx-auto mb-1.5" />
+                  <div className="text-xs font-semibold text-neutral-900">Revenue Growth</div>
+                </div>
+              </div>
+
+              {/* Technology Stack Expertise */}
+              <div className="bg-white border border-neutral-200 rounded-xl p-6 shadow-sm">
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-neutral-900 mb-1.5">Construction Tech Stack Expertise</h3>
+                  <p className="text-sm text-neutral-600">Technologies I've successfully scaled across UKI and EMEA construction markets.</p>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Design & Planning */}
+                  <div>
+                    <div className="text-xs font-bold text-blue-600 mb-2 uppercase tracking-wider">Design & Planning</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className="px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md text-xs font-medium text-neutral-800">BIM</span>
+                      <span className="px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md text-xs font-medium text-neutral-800">AR</span>
+                      <span className="px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md text-xs font-medium text-neutral-800">VR</span>
+                      <span className="px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md text-xs font-medium text-neutral-800">Digital Twins</span>
+                      <span className="px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md text-xs font-medium text-neutral-800">Reality Capture</span>
+                      <span className="px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md text-xs font-medium text-neutral-800">BIM/VDC Workflows</span>
+                    </div>
+                  </div>
+
+                  {/* Project Execution */}
+                  <div>
+                    <div className="text-xs font-bold text-green-600 mb-2 uppercase tracking-wider">Project Execution</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className="px-2.5 py-1 bg-green-50 border border-green-200 rounded-md text-xs font-medium text-neutral-800">Contract Management</span>
+                      <span className="px-2.5 py-1 bg-green-50 border border-green-200 rounded-md text-xs font-medium text-neutral-800">CDE / Document Control</span>
+                      <span className="px-2.5 py-1 bg-green-50 border border-green-200 rounded-md text-xs font-medium text-neutral-800">RFIs/Submittals</span>
+                      <span className="px-2.5 py-1 bg-green-50 border border-green-200 rounded-md text-xs font-medium text-neutral-800">Change Orders</span>
+                      <span className="px-2.5 py-1 bg-green-50 border border-green-200 rounded-md text-xs font-medium text-neutral-800">QA/QC & Field Inspections</span>
+                      <span className="px-2.5 py-1 bg-green-50 border border-green-200 rounded-md text-xs font-medium text-neutral-800">Project Controls</span>
+                      <span className="px-2.5 py-1 bg-green-50 border border-green-200 rounded-md text-xs font-medium text-neutral-800">Scheduling</span>
+                    </div>
+                  </div>
+
+                  {/* Operations & Management */}
+                  <div>
+                    <div className="text-xs font-bold text-amber-600 mb-2 uppercase tracking-wider">Operations & Management</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-md text-xs font-medium text-neutral-800">ERP</span>
+                      <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-md text-xs font-medium text-neutral-800">CMMS/EAM</span>
+                      <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-md text-xs font-medium text-neutral-800">Estimation</span>
+                      <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-md text-xs font-medium text-neutral-800">Materials/Waste Data</span>
+                      <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-md text-xs font-medium text-neutral-800">ESG</span>
+                    </div>
+                  </div>
+
+                  {/* Target Buyers */}
+                  <div>
+                    <div className="text-xs font-bold text-neutral-600 mb-2 uppercase tracking-wider">Target Buyers</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className="px-2.5 py-1 bg-neutral-100 border border-neutral-300 rounded-md text-xs font-semibold text-neutral-800">Owner/Developer</span>
+                      <span className="px-2.5 py-1 bg-neutral-100 border border-neutral-300 rounded-md text-xs font-semibold text-neutral-800">General Contractor</span>
+                      <span className="px-2.5 py-1 bg-neutral-100 border border-neutral-300 rounded-md text-xs font-semibold text-neutral-800">EPC</span>
+                      <span className="px-2.5 py-1 bg-neutral-100 border border-neutral-300 rounded-md text-xs font-semibold text-neutral-800">PMO</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ROI Calculator Widget */}
+      <ROICalculator />
+
+      {/* Comparison Table */}
+      <ComparisonTable />
+
+      {/* FAQ Section */}
+      <FAQSection />
+
+      {/* CTA Section with Urgency & Social Proof */}
+      <section id="contact" className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-neutral-900 to-blue-900 text-white relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-400 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          {/* Urgency Badge */}
+          <div className="inline-block px-4 py-2 bg-amber-500 text-white text-sm font-bold rounded-full mb-6 animate-pulse">
+            ⚡ Limited Availability: 2 Slots Open for Q1 2025
+          </div>
+
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Ready to Build Your Revenue Engine?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            Book a discovery call to discuss your growth challenges. No pitch, no pressure—just an honest conversation about whether we're the right fit.
+          </p>
+
+          {/* Social Proof */}
+          <div className="bg-white/10 backdrop-blur rounded-xl p-6 mb-12 max-w-2xl mx-auto border border-white/20">
+            <div className="flex items-center justify-center mb-3">
+              <Users className="h-5 w-5 text-blue-300 mr-2" />
+              <div className="text-sm font-semibold text-blue-200">Trusted by ConTech Leaders</div>
+            </div>
+            <p className="text-sm text-neutral-300">
+              "Working with Mohammad helped us close 4 enterprise deals in 90 days. His ConTech expertise is unmatched."
+            </p>
+            <p className="text-xs text-blue-300 mt-2 font-semibold">— VP of Sales, $12M ARR Construction SaaS</p>
+          </div>
+
+          {/* Process Steps */}
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-white/10 backdrop-blur p-6 rounded-xl border border-white/20">
+              <Calendar className="h-8 w-8 text-blue-400 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">1. Book Discovery Call</h3>
+              <p className="text-sm text-neutral-300">30-minute video call to understand your situation.</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur p-6 rounded-xl border border-white/20">
+              <Target className="h-8 w-8 text-blue-400 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">2. Custom Strategy</h3>
+              <p className="text-sm text-neutral-300">Tailored approach based on your specific needs.</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur p-6 rounded-xl border border-white/20">
+              <Rocket className="h-8 w-8 text-blue-400 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">3. Start Growing</h3>
+              <p className="text-sm text-neutral-300">Begin execution within 2 weeks.</p>
+            </div>
+          </div>
+
+          {/* Embedded Calendar */}
+          <div className="max-w-4xl mx-auto bg-white rounded-2xl p-4 shadow-2xl mb-8">
+            <div className="bg-neutral-50 rounded-xl p-8 text-center">
+              <div className="mb-6">
+                <Calendar className="h-16 w-16 text-blue-600 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-neutral-900 mb-2">Book Your 20-Minute Fit Call</h3>
+                <p className="text-neutral-600 mb-4">Pick a time that works for you. No pitch, no pressure—just an honest assessment of whether we're the right fit.</p>
+
+                {/* What Happens Next Micro-copy */}
+                <div className="bg-blue-50 rounded-lg p-4 mb-6 text-left">
+                  <div className="font-semibold text-blue-900 mb-3">What happens on this call:</div>
+                  <div className="space-y-2 text-sm text-neutral-700">
+                    <div className="flex items-start">
+                      <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>I'll ask about your ARR, team structure, and biggest revenue challenges</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>You'll learn if your situation fits my expertise (I'll tell you if it doesn't)</span>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>If there's a fit, I'll outline a proposed approach and next steps</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Calendly Embed Placeholder */}
+              <div className="bg-white rounded-xl border-2 border-dashed border-neutral-300 p-12 mb-4">
+                <p className="text-neutral-600 mb-4 font-semibold">
+                  📅 Replace this section with your Calendly embed code
+                </p>
+                <p className="text-sm text-neutral-500 mb-4">
+                  Add your Calendly URL here. Standard embed code:
+                </p>
+                <code className="text-xs bg-neutral-100 p-3 rounded block text-left overflow-x-auto">
+                  {`<!-- Calendly inline widget begin -->\n<div class="calendly-inline-widget" data-url="YOUR_CALENDLY_LINK" style="min-width:320px;height:700px;"></div>\n<script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>\n<!-- Calendly inline widget end -->`}
+                </code>
+              </div>
+
+              {/* Trust Elements */}
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-neutral-600">
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
+                  No obligation
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
+                  20 minutes
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
+                  100% confidential
+                </div>
+                <div className="flex items-center">
+                  <Shield className="h-4 w-4 text-blue-600 mr-1" />
+                  No-pitch guarantee
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-sm text-neutral-400">
+            Prefer email? Reach out directly: <a href="mailto:mohammad@example.com" className="text-blue-400 font-semibold hover:underline">mohammad@example.com</a>
+          </p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-neutral-900 text-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-6 md:mb-0">
+              <div className="text-2xl font-bold mb-2">Mohammad Daudi</div>
+              <p className="text-neutral-400">Elite Fractional CRO for ConTech & PropTech</p>
+            </div>
+            <div className="flex gap-6">
+              <a href="#services" className="text-neutral-400 hover:text-white transition-colors">Services</a>
+              <a href="#results" className="text-neutral-400 hover:text-white transition-colors">Results</a>
+              <a href="#about" className="text-neutral-400 hover:text-white transition-colors">About</a>
+              <a href="#contact" className="text-neutral-400 hover:text-white transition-colors">Contact</a>
+            </div>
+          </div>
+          <div className="mt-8 pt-8 border-t border-neutral-800 text-center text-neutral-400 text-sm">
+            © 2025 Mohammad Daudi. All rights reserved.
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+export default App;
